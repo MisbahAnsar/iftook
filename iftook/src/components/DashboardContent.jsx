@@ -8,7 +8,7 @@ const DashboardContent = () => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div className="bg-white p-6 rounded-lg shadow-sm">
+      {/* <div className="bg-white p-6 rounded-lg shadow-sm">
         <h3 className="font-semibold text-gray-800 mb-4">Active Users</h3>
         <div className="flex items-center justify-center">
           <div className="relative w-32 h-32">
@@ -69,7 +69,8 @@ const DashboardContent = () => {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
+      {/* <h1 className='text-2xl text-white'>Please check the Users page</h1> */}
     </div>
   );
 };
