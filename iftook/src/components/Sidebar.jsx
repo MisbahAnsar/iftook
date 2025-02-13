@@ -20,8 +20,12 @@ const Sidebar = ({ activeItem, setActiveItem, isMobileMenuOpen, setIsMobileMenuO
         lg:translate-x-0 lg:w-64 w-64
       `}
     >
-      <div className="p-6 border-b">
-        <h1 className="text-xl font-bold text-gray-900">Admin Panel</h1>
+      <div className="p-2 border-b">
+      <img 
+  src="../assets/iftookimg.jpg"
+alt="Logo" 
+  className="h-20 w-56 rounded-md mx-auto" 
+/>
       </div>
       <nav className="mt-4">
         {menuItems.map((item) => (

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, Wallet, Star } from 'lucide-react';
 import { users } from "../data/users"; // Ensure you have user data
 
-const UserProfileSidebar = ({ userId }) => {
+const UserProfileSidebar = ({ userId, onClose }) => {
   const user = users.find((u) => u.id === userId);
   if (!user) return null;
 
@@ -31,6 +31,12 @@ const UserProfileSidebar = ({ userId }) => {
   
   return (
     <div className="fixed top-0 left-0 h-full w-64 bg-white shadow-lg text-gray-800">
+        <button 
+        onClick={onClose} 
+        className="absolute top-4 right-4 text-gray-700 hover:text-gray-900"
+      >
+        <X size={24} />
+      </button>
       {/* Profile Section */}
       <div className="relative text-center">
         {/* Background Overlay (Half Cover) */}
@@ -110,14 +116,21 @@ const UserProfileSidebar = ({ userId }) => {
 
         {/* Rating Review Modal */}
         {isReviewModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+<div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[1000]">
             <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
               {/* Modal Header */}
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold text-gray-900">User Reviews</h2>
-                <button onClick={() => setIsReviewModalOpen(false)} className="text-gray-600 hover:text-gray-800">
-                  <X size={24} />
-                </button>
+                <button
+  onClick={() => {
+    console.log("Opening Review Modal"); // Debugging
+    setIsReviewModalOpen(true);
+  }}
+  className="flex items-center justify-center bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition"
+>
+  <Star size={18} className="mr-2" /> Rating Review
+</button>
+
               </div>
 
               {/* Filter by Stars */}
@@ -166,7 +179,7 @@ const UserProfileSidebar = ({ userId }) => {
 
         {/* Wallet Transactions Modal */}
         {isWalletModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[1000]">
             <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
               {/* Modal Header */}
               <div className="flex justify-between items-center mb-4">
