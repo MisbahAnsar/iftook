@@ -39,7 +39,43 @@ export const users = [
         { stars: 5, review: 'Great conversation!', date: '2024-03-15' },
         { stars: 4, review: 'Very helpful', date: '2024-03-14' }
       ],
-      status: 'Live'
-    },
-    // Add more dummy users here
-  ];
+      status: 'Live',
+    friends: [2, 3, 4], // IDs of friends
+    friendRequests: [5, 6] // Pending friend requests
+  },
+  {
+    id: 2,
+    name: 'John Doe',
+    email: 'johndoe@gmail.com',
+    profileImage: 'https://randomuser.me/api/portraits/men/2.jpg',
+    status: 'Offline'
+  },
+  {
+    id: 3,
+    name: 'Jane Smith',
+    email: 'janesmith@gmail.com',
+    profileImage: 'https://randomuser.me/api/portraits/women/3.jpg',
+    status: 'Live'
+  },
+  {
+    id: 4,
+    name: 'Mike Johnson',
+    email: 'mikejohnson@gmail.com',
+    profileImage: 'https://randomuser.me/api/portraits/men/4.jpg',
+    status: 'Live'
+  },
+  {
+    id: 5,
+    name: 'Sarah Lee',
+    email: 'sarahlee@gmail.com',
+    profileImage: 'https://randomuser.me/api/portraits/women/5.jpg',
+    status: 'Pending'
+  },
+  {
+    id: 6,
+    name: 'Emma Watson',
+    email: 'emmawatson@gmail.com',
+    profileImage: 'https://randomuser.me/api/portraits/women/6.jpg',
+    status: 'Pending'
+  }
+];
