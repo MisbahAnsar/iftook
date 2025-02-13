@@ -32,12 +32,21 @@ export const users = [
           { type: 'payment', description: 'Payment for meeting', amount: 300, date: '2024-03-15' },
           { type: 'tipping', description: 'Tip received', amount: 50, date: '2024-03-14' },
           { type: 'promote', description: 'Profile promotion', amount: -100, date: '2024-03-13' },
-          { type: 'subscription', description: 'Live subscription', amount: 200, date: '2024-03-12' }
+          { type: 'subscription', description: 'Live subscription', amount: 200, date: '2024-03-12' },
+          { type: 'subscription', description: 'Live subscription', amount: 200, date: '2024-03-12' },
+          { type: 'subscription', description: 'Live subscription', amount: 200, date: '2024-03-12' },
+          { type: 'subscription', description: 'Live subscription', amount: 200, date: '2024-03-12' },
         ]
       },
       ratings: [
         { stars: 5, review: 'Great conversation!', date: '2024-03-15' },
-        { stars: 4, review: 'Very helpful', date: '2024-03-14' }
+        { stars: 4, review: 'Very helpful', date: '2024-03-14' },
+        { stars: 4, review: 'Very helpful', date: '2024-03-14' },
+        { stars: 4, review: 'Very helpful', date: '2024-03-14' },
+        { stars: 4, review: 'Very helpful', date: '2024-03-14' },
+        { stars: 4, review: 'Very helpful', date: '2024-03-14' },
+        { stars: 4, review: 'Very helpful', date: '2024-03-14' },
+        { stars: 4, review: 'Very helpful', date: '2024-03-14' },
       ],
       status: 'Live',
     friends: [2, 3, 4], // IDs of friends

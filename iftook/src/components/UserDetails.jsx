@@ -24,13 +24,24 @@ const TabButton = ({ active, children, onClick, icon: Icon }) => (
   </button>
 );
 
-const UserDetails = ({ userId, onBack }) => {
+const UserDetails = ({ userId }) => {
   const user = users.find((u) => u.id === userId);
   const [activeTab, setActiveTab] = useState("Personal Details");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchAmount, setSearchAmount] = useState("");
+  const [friends, setFriends] = useState(user.friends);
+  const [friendRequests, setFriendRequests] = useState(user.friendRequests);
 
   if (!user) return null;
+
+  const handleAcceptRequest = (requestId) => {
+    setFriends([...friends, requestId]); // Add to friends list
+    setFriendRequests(friendRequests.filter((id) => id !== requestId)); // Remove from friend requests
+  };
+
+  const handleRejectRequest = (requestId) => {
+    setFriendRequests(friendRequests.filter((id) => id !== requestId)); // Just remove from friend requests
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-lg">
@@ -143,64 +154,67 @@ const UserDetails = ({ userId, onBack }) => {
           {activeTab === "My Activity" && (
             <div className="bg-gray-100 p-4 rounded-lg">
               <h4 className="font-semibold text-gray-800 mb-2">My Activity</h4>
-              <p className="text-gray-600">User’s activity logs, posts, and interactions.</p>
+              <p className="text-gray-600">User's activity logs, posts, and interactions.</p>
             </div>
           )}
 
-          
-{activeTab === "Friends List" && (
-  <div className="bg-gray-100 p-4 rounded-lg">
-    <h4 className="font-semibold text-gray-800 mb-2">Friends List</h4>
 
-    {/* Total Friends */}
-    <div className="mb-4">
-      <h5 className="font-semibold text-gray-700 mb-2">Total Friends ({user.friends.length})</h5>
-      {user.friends.length > 0 ? (
-        <div className="space-y-2">
-          {user.friends.map((friendId) => {
-            const friend = users.find((u) => u.id === friendId);
-            return friend ? (
-              <div key={friend.id} className="flex items-center p-3 bg-white rounded-lg shadow-md">
-                <img src={friend.profileImage} alt={friend.name} className="w-10 h-10 rounded-full mr-3" />
-                <div>
-                  <p className="text-gray-800 font-semibold">{friend.name}</p>
-                  <p className={`text-sm ${friend.status === "Live" ? "text-green-600" : "text-gray-600"}`}>
-                    {friend.status}
-                  </p>
+<div className="space-y-6">
+          {activeTab === "Friends List" && (
+            <div className="bg-gray-100 p-4 rounded-lg">
+              <h4 className="font-semibold text-gray-800 mb-2">Friends List</h4>
+
+              {/* Total Friends */}
+              <div>
+                <h5 className="text-gray-700 font-semibold mb-2">Total Friends ({friends.length})</h5>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {friends.map((friendId) => {
+                    const friend = users.find((u) => u.id === friendId);
+                    return friend ? (
+                      <div key={friend.id} className="flex items-center bg-white p-3 rounded-lg shadow">
+                        <img src={friend.profileImage} alt={friend.name} className="w-12 h-12 rounded-full mr-3" />
+                        <p className="text-gray-800 font-medium">{friend.name}</p>
+                      </div>
+                    ) : null;
+                  })}
                 </div>
               </div>
-            ) : null;
-          })}
-        </div>
-      ) : (
-        <p className="text-gray-600">No friends yet.</p>
-      )}
-    </div>
 
-    {/* Total Friend Requests */}
-    <div>
-      <h5 className="font-semibold text-gray-700 mb-2">Total Friend Requests ({user.friendRequests.length})</h5>
-      {user.friendRequests.length > 0 ? (
-        <div className="space-y-2">
-          {user.friendRequests.map((requestId) => {
-            const requestUser = users.find((u) => u.id === requestId);
-            return requestUser ? (
-              <div key={requestUser.id} className="flex items-center p-3 bg-white rounded-lg shadow-md">
-                <img src={requestUser.profileImage} alt={requestUser.name} className="w-10 h-10 rounded-full mr-3" />
-                <div>
-                  <p className="text-gray-800 font-semibold">{requestUser.name}</p>
-                  <p className="text-yellow-600 text-sm">Pending Request</p>
+              {/* Friend Requests */}
+              <div className="mt-4">
+                <h5 className="text-gray-700 font-semibold mb-2">Friend Requests ({friendRequests.length})</h5>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {friendRequests.map((requestId) => {
+                    const requestUser = users.find((u) => u.id === requestId);
+                    return requestUser ? (
+                      <div key={requestUser.id} className="flex items-center justify-between bg-white p-3 rounded-lg shadow">
+                        <div className="flex items-center">
+                          <img src={requestUser.profileImage} alt={requestUser.name} className="w-12 h-12 rounded-full mr-3" />
+                          <p className="text-gray-800 font-medium">{requestUser.name}</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <button 
+                            onClick={() => handleAcceptRequest(requestUser.id)} 
+                            className="px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                          >
+                            Accept
+                          </button>
+                          <button 
+                            onClick={() => handleRejectRequest(requestUser.id)} 
+                            className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      </div>
+                    ) : null;
+                  })}
                 </div>
               </div>
-            ) : null;
-          })}
+            </div>
+          )}
         </div>
-      ) : (
-        <p className="text-gray-600">No pending friend requests.</p>
-      )}
-    </div>
-  </div>
-)}
+
 
 
           {activeTab === "Promote Profile" && (
