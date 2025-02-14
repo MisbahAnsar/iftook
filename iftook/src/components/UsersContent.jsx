@@ -1,48 +1,29 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Eye } from "lucide-react";
-import { users } from "../data/users";
+import { getAllUsers } from "../utils/api"; // Assuming getAllUsers is in api/auth.js
+import { users as dummyUsers } from "../data/users"; // Importing dummy data
 
 const UsersContent = ({ onUserClick }) => {
-  
-  const getAllUsers = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      // console.log("token", token);
-      if (!token) {
-        console.log("Not authorized - No token provided");
-        return;
-      }
-
-      const response = await fetch("https://iftook-backend.vercel.app/api/users/all", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        console.log("Failed to fetch users:", data.message || "Unknown error");
-        return;
-      }
-
-      console.log("Fetched users:", data.users);
-    } catch (error) {
-      console.error("Error fetching users:", error.message);
-    }
-  };
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    getAllUsers();
+    const fetchUsers = async () => {
+      const response = await getAllUsers();
+      if (response.success) {
+        setUsers(response.users);
+      } else {
+        setError(response.message);
+      }
+      setLoading(false);
+    };
+
+    fetchUsers();
   }, []);
 
-  const demoUser = users.find((user) => user.id === 1);
-
-  if (!demoUser) {
-    return <p className="text-gray-600 text-center py-4">Demo user not found.</p>;
-  }
+  if (loading) return <p className="text-gray-600 text-center py-4">Loading users...</p>;
+  if (error) return <p className="text-red-600 text-center py-4">{error}</p>;
 
   return (
     <div className="bg-white rounded-xl shadow-md p-6">
@@ -64,48 +45,57 @@ const UsersContent = ({ onUserClick }) => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-300">
-            <tr key={demoUser.id} className="hover:bg-gray-100 transition">
-              <td className="px-4 py-4 whitespace-nowrap">
-                <div className="flex items-center">
-                  <img
-                    className="h-10 w-10 rounded-full border border-gray-400"
-                    src={demoUser.profileImage}
-                    alt="Profile"
-                  />
-                  <div className="ml-3">
-                    <div className="text-sm font-medium text-gray-900">
-                      {demoUser.name}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      ID: {demoUser.id}
-                    </div>
-                  </div>
-                </div>
-              </td>
-              <td className="px-4 py-4 whitespace-nowrap">
-                <span className="text-sm text-gray-700">{demoUser.email}</span>
-              </td>
-              <td className="px-4 py-4 whitespace-nowrap">
-                <span
-                  className={`px-2 py-1 inline-flex text-xs font-semibold rounded-md ${
-                    demoUser.status === "Live"
-                      ? "bg-green-200 text-green-800"
-                      : "bg-gray-200 text-gray-700"
-                  }`}
-                >
-                  {demoUser.status}
-                </span>
-              </td>
-              <td className="px-4 py-4 whitespace-nowrap text-sm">
-                <button
-                  onClick={() => onUserClick(demoUser.id)}
-                  className="flex items-center px-3 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium shadow-sm transition"
-                >
-                  <Eye className="h-4 w-4 mr-2" />
-                  View Details
-                </button>
-              </td>
-            </tr>
+            {users.length > 0 ? (
+              users.map((user, index) => {
+                // Use a dummy user for the details (cycling through them if necessary)
+                const demoUser = dummyUsers[index % dummyUsers.length];
+
+                return (
+                  <tr key={user._id} className="hover:bg-gray-100 transition">
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <img
+                          className="h-10 w-10 rounded-full border border-gray-400"
+                          src={user.photos?.[0] || "https://via.placeholder.com/40"}
+                          alt="Profile"
+                        />
+                        <div className="ml-3">
+                          <div className="text-sm font-medium text-gray-900">{user.name}</div>
+                          <div className="text-xs text-gray-500">ID: {user._id}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <span className="text-sm text-gray-700">{user.email}</span>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <span
+                        className={`px-2 py-1 inline-flex text-xs font-semibold rounded-md ${
+                          user.isOnline ? "bg-green-200 text-green-800" : "bg-gray-200 text-gray-700"
+                        }`}
+                      >
+                        {user.isOnline ? "Online" : "Offline"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                      <button
+                        onClick={() => onUserClick(demoUser.id)} // Always pass dummy user ID
+                        className="flex items-center px-3 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium shadow-sm transition"
+                      >
+                        <Eye className="h-4 w-4 mr-2" />
+                        View Details
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan="4" className="px-4 py-4 text-center text-gray-600">
+                  No users found.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
