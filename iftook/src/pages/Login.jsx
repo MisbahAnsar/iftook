@@ -34,12 +34,12 @@ function LoginPage({ onLoginSuccess }) {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black p-4">
-      <div className="w-full max-w-md space-y-8">
+      <div className="w-full max-w-sm space-y-8">
         {/* Centered Image */}
         <img
           src="https://sushistash.tushitgarg.com/api/images/BQACAgUAAxkDAANwZ68Eg62tFFWAC7oBAz6y0_gavvsAApATAALQjnhVeX-DQFHDd-M2BA"
           alt="Login"
-          className="mx-auto mt-20 w-40 h-40 object-cover rounded-md"
+          className="mx-auto mt-20 h-28 sm:w-72 sm:h-40 object-cover rounded-md"
         />
 
         <form onSubmit={handleLogin} className="bg-gray-900 p-8 rounded-lg">
