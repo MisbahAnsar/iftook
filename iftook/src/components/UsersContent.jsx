@@ -13,7 +13,7 @@ const UsersContent = ({ onUserClick }) => {
       const response = await getAllUsers();
       if (response.success) {
         // Reverse the users array to display the most recent user first
-        setUsers(response.users.reverse());
+        setUsers(response.users);
       } else {
         setError(response.message);
       }
