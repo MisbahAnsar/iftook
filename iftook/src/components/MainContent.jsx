@@ -39,14 +39,14 @@ const MainContent = ({ activeItem, selectedUserId, setSelectedUserId }) => {
   return (
     <div className="lg:ml-64 min-h-screen bg-gray-100 relative">
       {/* Conditional Button to Open Sidebar */}
-      {showButton && (
+      {/* {showButton && (
         <button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           className="fixed lg:hidden top-4 left-4 z-50 bg-blue-500 text-white p-2 rounded-lg shadow-lg hover:bg-blue-600 transition"
         >
           <Menu size={24} />
         </button>
-      )}
+      )} */}
 
       {/* Sidebar */}
       {isSidebarOpen && <UserProfileSidebar userId={selectedUserId} />}

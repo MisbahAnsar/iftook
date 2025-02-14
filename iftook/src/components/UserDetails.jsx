@@ -34,6 +34,7 @@ const UserDetails = ({ userId }) => {
   const [friendRequests, setFriendRequests] = useState(user.friendRequests);
   const [isBlocked, setIsBlocked] = useState(false);
   const [blockReason, setBlockReason] = useState("");
+  const [availability, setAvailability] = useState(Array(30).fill(true)); // true = available, false = unavailable
 
   if (!user) return null;
 
@@ -48,6 +49,11 @@ const UserDetails = ({ userId }) => {
 
   const adminUser = users.find((user) => user.id === 1);
 
+  const toggleAvailability = (index) => {
+    const newAvailability = [...availability];
+    newAvailability[index] = !newAvailability[index];
+    setAvailability(newAvailability);
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-lg">
@@ -68,66 +74,83 @@ const UserDetails = ({ userId }) => {
 
         {/* Content Section Based on Active Tab */}
         <div className="space-y-6">
-          {activeTab === "Personal Details" && (
-            <div className="bg-gray-100 p-4 rounded-lg">
-              <h4 className="font-semibold text-2xl text-gray-800 mb-2">About Me</h4>
-              <p className="text-gray-600">Professional profile with extensive experience...</p>
-              <div>
-            <h4 className="font-semibold text-gray-800 mb-2">Interests</h4>
-            <div className="flex flex-wrap gap-2">
-              {user.interests.map((interest, index) => (
-                <span key={index} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
-                  {interest}
-                </span>
-              ))}
-            </div>
-          </div>
+        {activeTab === "Personal Details" && (
+  <div className="bg-gradient-to-br from-[#eef2ff] to-[#f8f9fc] p-6 rounded-2xl shadow-md space-y-6">
+    {/* About Me */}
+    <div>
+      <h4 className="font-semibold text-2xl text-[#2a2e5b]">About Me</h4>
+      <p className="text-[#4a5568] leading-relaxed">
+        Professional profile with extensive experience...
+      </p>
+    </div>
 
-          {/* Earning Charges */}
-          <div>
-            <h4 className="font-semibold text-gray-800 mb-2">Earning Charges</h4>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {Object.entries(user.earnings).map(([key, value]) => (
-                <div key={key} className="p-3 bg-gray-100 rounded-lg">
-                  <p className="text-sm text-gray-600 capitalize">{key}</p>
-                  <p className="font-semibold text-gray-800">{value}</p>
-                </div>
-              ))}
-            </div>
+    {/* Interests */}
+    <div>
+      <h4 className="font-semibold text-xl text-[#2a2e5b]">Interests</h4>
+      <div className="flex flex-wrap gap-3 mt-2">
+        {user.interests.map((interest, index) => (
+          <span 
+            key={index} 
+            className="px-4 py-2 bg-[#e0e7ff] text-[#3730a3] rounded-full text-sm font-medium"
+          >
+            {interest}
+          </span>
+        ))}
+      </div>
+    </div>
+
+    {/* Earning Charges */}
+    <div>
+      <h4 className="font-semibold text-xl text-[#2a2e5b]">Earning Charges</h4>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-2">
+        {Object.entries(user.earnings).map(([key, value]) => (
+          <div 
+            key={key} 
+            className="p-4 bg-white/60 backdrop-blur-lg border border-[#c7d2fe] rounded-lg shadow-lg"
+          >
+            <p className="text-sm text-[#475569] capitalize">{key}</p>
+            <p className="font-semibold text-lg text-[#1e40af]">{value}</p>
           </div>
-            </div>
-          )}
+        ))}
+      </div>
+    </div>
+  </div>
+)}
+
 
 {activeTab === "Payment" && (
-  <div>
-    <h4 className="font-semibold text-gray-800 mb-2">Payment Details</h4>
-    <p className="text-gray-600 text-sm mb-2">All transactions through bank will be shown here.</p>
+  <div className="bg-gradient-to-br from-[#eef2ff] to-[#f8f9fc] p-6 rounded-2xl shadow-md space-y-6">
+    {/* Payment Details Header */}
+    <div>
+      <h4 className="font-semibold text-2xl text-[#2a2e5b]">Payment Details</h4>
+      <p className="text-[#4a5568] text-sm">All transactions through the bank will be shown here.</p>
+    </div>
 
     {/* Search Inputs */}
-    <div className="mb-4 flex gap-2">
+    <div className="mb-4 flex flex-col md:flex-row gap-3">
       <input 
         type="text" 
         placeholder="Search by date (YYYY-MM-DD)" 
-        className="p-2 rounded border border-gray-300 text-gray-800 placeholder-gray-400 w-1/2"
+        className="p-3 rounded-lg border border-[#c7d2fe] bg-white/60 backdrop-blur-lg text-[#2a2e5b] placeholder-[#64748b] w-full md:w-1/2"
         value={searchQuery} 
         onChange={(e) => setSearchQuery(e.target.value)}
       />
       <input 
         type="text" 
         placeholder="Search by amount" 
-        className="p-2 rounded border border-gray-300 text-gray-800 placeholder-gray-400 w-1/2"
+        className="p-3 rounded-lg border border-[#c7d2fe] bg-white/60 backdrop-blur-lg text-[#2a2e5b] placeholder-[#64748b] w-full md:w-1/2"
         value={searchAmount} 
         onChange={(e) => setSearchAmount(e.target.value)}
       />
     </div>
 
     {/* Transactions Sections */}
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+
       {/* Added to Wallet Section */}
-      <div className="bg-gray-100 p-4 rounded-lg">
-        <h5 className="text-gray-800 font-semibold mb-2">Added to Wallet</h5>
-        <div className="max-h-[300px] overflow-y-auto space-y-2">
+      <div className="bg-white/70 backdrop-blur-lg border border-[#c7d2fe] p-5 rounded-2xl shadow-lg">
+        <h5 className="text-[#2a2e5b] font-semibold text-lg">Added to Wallet</h5>
+        <div className="max-h-[300px] overflow-y-auto space-y-3 mt-3">
           {user.paymentDetails.transactions
             .filter(transaction => 
               transaction.type === 'payment' &&
@@ -135,21 +158,21 @@ const UserDetails = ({ userId }) => {
               (!searchAmount || transaction.amount.toString().includes(searchAmount))
             )
             .map((transaction, index) => (
-              <div key={index} className="flex justify-between p-3 bg-white rounded-lg shadow">
+              <div key={index} className="flex justify-between p-4 bg-[#e0e7ff] rounded-lg shadow">
                 <div>
-                  <p className="font-medium text-gray-800">{transaction.description}</p>
-                  <p className="text-sm text-gray-600">{transaction.date}</p>
+                  <p className="font-medium text-[#2a2e5b]">{transaction.description}</p>
+                  <p className="text-sm text-[#64748b]">{transaction.date}</p>
                 </div>
-                <p className="text-green-600">+{transaction.amount}</p>
+                <p className="text-[#047857] font-semibold">+{transaction.amount}</p>
               </div>
             ))}
         </div>
       </div>
 
       {/* Withdrawal to Bank Section */}
-      <div className="bg-gray-100 p-4 rounded-lg">
-        <h5 className="text-gray-800 font-semibold mb-2">Withdrawal to Bank</h5>
-        <div className="max-h-[300px] overflow-y-auto space-y-2">
+      <div className="bg-white/70 backdrop-blur-lg border border-[#c7d2fe] p-5 rounded-2xl shadow-lg">
+        <h5 className="text-[#2a2e5b] font-semibold text-lg">Withdrawal to Bank</h5>
+        <div className="max-h-[300px] overflow-y-auto space-y-3 mt-3">
           {user.paymentDetails.transactions
             .filter(transaction => 
               transaction.type === 'withdrawal' &&
@@ -157,12 +180,12 @@ const UserDetails = ({ userId }) => {
               (!searchAmount || transaction.amount.toString().includes(searchAmount))
             )
             .map((transaction, index) => (
-              <div key={index} className="flex justify-between p-3 bg-white rounded-lg shadow">
+              <div key={index} className="flex justify-between p-4 bg-[#fef2f2] rounded-lg shadow">
                 <div>
-                  <p className="font-medium text-gray-800">{transaction.description}</p>
-                  <p className="text-sm text-gray-600">{transaction.date}</p>
+                  <p className="font-medium text-[#2a2e5b]">{transaction.description}</p>
+                  <p className="text-sm text-[#64748b]">{transaction.date}</p>
                 </div>
-                <p className="text-red-600">-{transaction.amount}</p>
+                <p className="text-[#b91c1c] font-semibold">-{transaction.amount}</p>
               </div>
             ))}
         </div>
@@ -174,26 +197,29 @@ const UserDetails = ({ userId }) => {
 
 
 {activeTab === "Talk Details" && (
-  <div className="bg-gray-100 p-4 rounded-lg">
-    <h4 className="font-semibold text-gray-800 mb-4">Talk Details</h4>
+  <div className="bg-gradient-to-br from-[#eef2ff] to-[#f8f9fc] p-6 rounded-2xl shadow-md space-y-6">
+    {/* Section Header */}
+    <div>
+      <h4 className="font-semibold text-2xl text-[#2a2e5b]">Talk Details</h4>
+    </div>
 
     {/* Upcoming Meeting */}
     {user?.meetings?.upcoming?.length > 0 && (
-      <div className="bg-white p-4 rounded-lg shadow-md mb-4">
-        <h5 className="text-green-600 font-semibold mb-2">Upcoming Meeting</h5>
-        <div className="flex items-center gap-3">
+      <div className="bg-white/70 backdrop-blur-lg border border-[#c7d2fe] p-5 rounded-2xl shadow-lg">
+        <h5 className="text-[#047857] font-semibold text-lg">Upcoming Meeting</h5>
+        <div className="flex items-center gap-4 mt-3">
           <img 
             src="https://randomuser.me/api/portraits/women/2.jpg" 
             alt={user.meetings.upcoming[0].name} 
-            className="w-12 h-12 rounded-full"
+            className="w-14 h-14 rounded-full border-2 border-[#c7d2fe] shadow-md"
           />
           <div>
-            <p className="text-gray-800 font-medium">{user.meetings.upcoming[0].name}</p>
-            <p className="text-gray-500 text-sm">{user.meetings.upcoming[0].type}</p>
+            <p className="text-[#2a2e5b] font-medium">{user.meetings.upcoming[0].name}</p>
+            <p className="text-[#64748b] text-sm">{user.meetings.upcoming[0].type}</p>
           </div>
-          <span className="ml-auto text-gray-600 text-sm">{user.meetings.upcoming[0].time}</span>
+          <span className="ml-auto text-[#475569] text-sm">{user.meetings.upcoming[0].time}</span>
         </div>
-        <p className="text-blue-600 text-sm mt-2 font-medium">
+        <p className="text-[#2563eb] text-sm mt-2 font-semibold">
           ₹{user.meetings.upcoming[0].amount}
         </p>
       </div>
@@ -201,27 +227,28 @@ const UserDetails = ({ userId }) => {
 
     {/* Previous Meeting */}
     {user?.meetings?.previous?.length > 0 && (
-      <div className="bg-white p-4 rounded-lg shadow-md">
-        <h5 className="text-red-600 font-semibold mb-2">Previous Meeting</h5>
-        <div className="flex items-center gap-3">
+      <div className="bg-white/70 backdrop-blur-lg border border-[#c7d2fe] p-5 rounded-2xl shadow-lg">
+        <h5 className="text-[#b91c1c] font-semibold text-lg">Previous Meeting</h5>
+        <div className="flex items-center gap-4 mt-3">
           <img 
             src="https://randomuser.me/api/portraits/men/3.jpg" 
             alt={user.meetings.previous[0].name} 
-            className="w-12 h-12 rounded-full"
+            className="w-14 h-14 rounded-full border-2 border-[#c7d2fe] shadow-md"
           />
           <div>
-            <p className="text-gray-800 font-medium">{user.meetings.previous[0].name}</p>
-            <p className="text-gray-500 text-sm">{user.meetings.previous[0].type}</p>
+            <p className="text-[#2a2e5b] font-medium">{user.meetings.previous[0].name}</p>
+            <p className="text-[#64748b] text-sm">{user.meetings.previous[0].type}</p>
           </div>
-          <span className="ml-auto text-gray-600 text-sm">{user.meetings.previous[0].time}</span>
+          <span className="ml-auto text-[#475569] text-sm">{user.meetings.previous[0].time}</span>
         </div>
-        <p className="text-blue-600 text-sm mt-2 font-medium">
+        <p className="text-[#2563eb] text-sm mt-2 font-semibold">
           ₹{user.meetings.previous[0].amount}
         </p>
       </div>
     )}
   </div>
 )}
+
 
 
           {activeTab === "My Activity" && (
@@ -234,7 +261,7 @@ const UserDetails = ({ userId }) => {
 
 <div className="space-y-6">
           {activeTab === "Friends List" && (
-            <div className="bg-gray-100 p-4 rounded-lg">
+            <div className="bg-gradient-to-br from-[#eef2ff] to-[#f8f9fc] p-4 rounded-lg">
               <h4 className="font-semibold text-gray-800 mb-2">Friends List</h4>
 
               {/* Total Friends */}
@@ -291,14 +318,21 @@ const UserDetails = ({ userId }) => {
 
 
         {activeTab === "Promote Profile" && (
-  <div className="bg-gray-100 p-6 rounded-lg">
-    <h4 className="text-lg font-semibold text-gray-800 mb-4">🚀 Promotion Package</h4>
+  <div className="bg-gradient-to-br from-[#eef2ff] to-[#f8f9fc] p-6 rounded-2xl shadow-md space-y-6">
+    
+    {/* Section Header */}
+    <h4 className="text-xl font-semibold text-[#2a2e5b] flex items-center gap-2">
+      🚀 Promotion Package
+    </h4>
 
     {user.promoteProfile ? (
-      <div className="bg-gradient-to-r from-indigo-500 to-blue-500 p-6 rounded-lg shadow-md text-white">
-        <h5 className="text-xl font-bold mb-3">{user.promoteProfile.package}</h5>
+      <div className="bg-white/90 backdrop-blur-lg border border-[#c7d2fe] p-6 rounded-2xl shadow-lg space-y-4">
+        
+        {/* Package Name */}
+        <h5 className="text-2xl font-bold text-[#2a2e5b]">{user.promoteProfile.package}</h5>
 
-        <div className="grid grid-cols-2 gap-4 text-sm">
+        {/* Promotion Details */}
+        <div className="grid grid-cols-2 gap-6 text-sm text-[#374151]">
           <p className="flex items-center gap-2">
             📅 <span>Start Date:</span> 
             <span className="font-medium">{user.promoteProfile.startDate}</span>
@@ -317,8 +351,17 @@ const UserDetails = ({ userId }) => {
           </p>
         </div>
 
+        {/* Progress Bar for Engagement */}
+        <div className="relative w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+          <div 
+            className="bg-gradient-to-r from-indigo-500 to-blue-500 h-3 rounded-full transition-all duration-500" 
+            style={{ width: `${(user.promoteProfile.clicks / user.promoteProfile.views) * 100}%` }}
+          />
+        </div>
+
+        {/* Boosting Message */}
         <div className="mt-4 flex justify-between items-center">
-          <span className="text-lg font-bold">💰 Boosting Your Profile!</span>
+          <span className="text-lg font-bold text-[#2a2e5b]">💰 Boosting Your Profile!</span>
         </div>
       </div>
     ) : (
@@ -328,64 +371,80 @@ const UserDetails = ({ userId }) => {
 )}
 
 
+
 {activeTab === "Restrict User" && (
-  <div className="bg-gray-100 p-4 rounded-lg">
-    <h4 className="font-semibold text-gray-800 mb-4">Restrict User</h4>
-    <p className="text-gray-600 mb-4">Restrict or block interactions with this user.</p>
+      <div className="bg-gray-100 p-4 sm:p-6 rounded-lg w-full max-w-3xl mx-auto shadow-md">
+        <h4 className="font-semibold text-gray-800 text-lg sm:text-xl mb-4">Restrict User</h4>
+        <p className="text-gray-600 text-sm sm:text-base mb-4">Restrict or block interactions with this user.</p>
 
-    {/* Block Reason Input */}
-    <div className="mb-4">
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        Reason for Blocking (optional)
-      </label>
-      <textarea
-        className="w-full p-2 border rounded-md text-gray-900"
-        placeholder="Enter reason for blocking..."
-        value={blockReason}
-        onChange={(e) => setBlockReason(e.target.value)}
-      />
-    </div>
+        {/* Block Reason Input */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Reason for Blocking (optional)</label>
+          <textarea
+            className="w-full p-2 border rounded-md text-gray-900 resize-none"
+            placeholder="Enter reason for blocking..."
+            value={blockReason}
+            onChange={(e) => setBlockReason(e.target.value)}
+          />
+        </div>
 
-    {/* Block/Unblock Toggle */}
-    <div className="flex items-center justify-between mb-4 bg-white p-3 rounded-md shadow">
-      <span className="text-gray-800 font-medium">User Status:</span>
-      <button
-        onClick={() => setIsBlocked(!isBlocked)}
-        className={`px-4 py-2 rounded-lg font-semibold transition ${
-          isBlocked ? "bg-red-600 text-white" : "bg-green-500 text-white"
-        }`}
-      >
-        {isBlocked ? "Unblock User" : "Block User"}
-      </button>
-    </div>
-
-    {/* Payout Status */}
-    {isBlocked && (
-      <div className="bg-yellow-100 text-yellow-700 p-3 rounded-md mb-4">
-        <strong>Note:</strong> User is blocked. Payout is currently on hold.
-      </div>
-    )}
-
-    {/* User Availability Calendar (Basic Mock) */}
-    <div className="bg-white p-4 rounded-md shadow">
-      <h5 className="font-semibold text-gray-800 mb-3">User Availability</h5>
-      <div className="grid grid-cols-7 gap-2 text-center text-gray-700">
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-          <div key={day} className="p-2 bg-gray-200 rounded-md">{day}</div>
-        ))}
-        {Array.from({ length: 30 }).map((_, index) => (
-          <div
-            key={index}
-            className={`p-2 rounded-md ${
-              isBlocked ? "bg-gray-300 text-gray-500" : "bg-green-100"
+        {/* Block/Unblock Toggle */}
+        <div className="flex items-center justify-between mb-4 bg-white p-3 rounded-md shadow">
+          <span className="text-gray-800 font-medium">User Status:</span>
+          <button
+            onClick={() => setIsBlocked(!isBlocked)}
+            className={`px-4 py-2 rounded-lg font-semibold transition ${
+              isBlocked ? "bg-red-600 text-white hover:bg-red-700" : "bg-green-500 text-white hover:bg-green-600"
             }`}
           >
-            {index + 1}
+            {isBlocked ? "Unblock User" : "Block User"}
+          </button>
+        </div>
+
+        {/* Payout Status */}
+        {isBlocked && (
+          <div className="bg-yellow-100 text-yellow-700 p-3 rounded-md mb-4">
+            <strong>Note:</strong> User is blocked. Payout is currently on hold.
           </div>
-        ))}
+        )}
+
+        {/* User Availability Calendar */}
+        <div className="bg-white p-3 rounded-md shadow">
+  <div className="flex justify-between items-center mb-2">
+    <h5 className="font-semibold text-gray-800 text-base">User Availability</h5>
+
+    <div className="flex gap-3">
+      <div className="flex items-center gap-1">
+        <span className="w-2.5 h-2.5 bg-blue-500 rounded-full"></span>
+        <h5 className="text-gray-700 text-xs">Available</h5>
+      </div>
+      <div className="flex items-center gap-1">
+        <span className="w-2.5 h-2.5 bg-yellow-700 rounded-full"></span>
+        <h5 className="text-gray-700 text-xs">Unavailable</h5>
       </div>
     </div>
   </div>
+
+  {/* Calendar Grid */}
+  <div className="grid grid-cols-7 gap-1 text-center text-gray-700 text-xs">
+    {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+      <div key={day} className="p-1 bg-gray-300 font-semibold rounded-md">{day}</div>
+    ))}
+    {Array.from({ length: 30 }).map((_, index) => (
+      <div
+        key={index}
+        className={`p-2 rounded-md cursor-pointer transition text-xs ${
+          availability[index] ? "bg-green-200 hover:bg-green-300" : "bg-red-300 hover:bg-red-400 text-white"
+        }`}
+        onClick={() => toggleAvailability(index)}
+      >
+        {index + 1}
+      </div>
+    ))}
+  </div>
+</div>
+
+      </div>
 )}
 
 
