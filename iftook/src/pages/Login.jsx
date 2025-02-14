@@ -39,7 +39,7 @@ function LoginPage({ onLoginSuccess }) {
         <img
           src="https://sushistash.tushitgarg.com/api/images/BQACAgUAAxkDAANwZ68Eg62tFFWAC7oBAz6y0_gavvsAApATAALQjnhVeX-DQFHDd-M2BA"
           alt="Login"
-          className="mx-auto mt-20 w-40 h-40 object-cover rounded-full"
+          className="mx-auto mt-20 w-40 h-40 object-cover rounded-md"
         />
 
         <form onSubmit={handleLogin} className="bg-gray-900 p-8 rounded-lg">
