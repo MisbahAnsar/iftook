@@ -51,10 +51,10 @@ function App() {
                   />
                 )}
                 <MainContent
-                  activeItem={activeItem}
-                  selectedUserId={selectedUserId}
-                  setSelectedUserId={setSelectedUserId}
-                />
+  activeItem={activeItem}
+  selectedUserId={selectedUserId}
+  setSelectedUserId={setSelectedUserId}
+/>
                 {isMobileMenuOpen && (
                   <div
                     className="fixed inset-0 bg-black bg-opacity-50 z-0 lg:hidden"

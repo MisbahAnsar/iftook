@@ -1,23 +1,68 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Wallet, Star } from 'lucide-react';
 import Modal from './Modal';
-import { users } from "../data/users";
+import { getAllUsers, getWalletData, addMoneyToWallet } from '../utils/api'; // Import new functions
 
 const UserProfileSidebar = ({ userId, onClose }) => {
-  const user = users.find((u) => u.id === userId);
-  if (!user) return null;
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState(null);
-  const [reviews, setReviews] = useState(user.ratings || []);
-  const [images, setImages] = useState([
-    user.profileImage,
-    "https://source.unsplash.com/random/200x200?portrait",
-    "https://source.unsplash.com/random/200x200?person",
-    "https://source.unsplash.com/random/200x200?face"
-  ]);
+  const [reviews, setReviews] = useState([]);
+  const [images, setImages] = useState([]);
+
+  const [walletData, setWalletData] = useState(null);
+  const [walletLoading, setWalletLoading] = useState(false);
+  const [walletError, setWalletError] = useState('');
+  const [amountToAdd, setAmountToAdd] = useState('');
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const response = await getAllUsers();
+      if (response.success) {
+        const foundUser = response.users.find((u) => u._id === userId);
+        if (foundUser) {
+          setUser(foundUser);
+          setReviews(foundUser.ratings || []);
+          setImages([
+            foundUser.photos?.[0] || "https://via.placeholder.com/40",
+            "https://source.unsplash.com/random/200x200?portrait",
+            "https://source.unsplash.com/random/200x200?person",
+            "https://source.unsplash.com/random/200x200?face"
+          ]);
+        } else {
+          setError('User not found');
+        }
+      } else {
+        setError(response.message);
+      }
+      setLoading(false);
+    };
+
+    fetchUser();
+  }, [userId]);
+
+  // Fetch wallet data when the wallet modal is opened
+  useEffect(() => {
+    if (isWalletModalOpen) {
+      const fetchWalletData = async () => {
+        setWalletLoading(true);
+        const response = await getWalletData(userId);
+        if (response.success) {
+          setWalletData(response.data);
+        } else {
+          setWalletError(response.message);
+        }
+        setWalletLoading(false);
+      };
+
+      fetchWalletData();
+    }
+  }, [isWalletModalOpen, userId]);
 
   const handleDelete = (index) => {
     setImages(images.filter((_, i) => i !== index));
@@ -26,6 +71,30 @@ const UserProfileSidebar = ({ userId, onClose }) => {
   const handleDeleteReview = (index) => {
     setReviews(reviews.filter((_, i) => i !== index));
   };
+
+  const handleAddMoney = async () => {
+    if (!amountToAdd || isNaN(amountToAdd)) {
+      setWalletError("Please enter a valid amount.");
+      return;
+    }
+
+    const response = await addMoneyToWallet(Number(amountToAdd));
+    if (response.success) {
+      // Update wallet data after adding money
+      const updatedWalletData = await getWalletData(userId);
+      if (updatedWalletData.success) {
+        setWalletData(updatedWalletData.data);
+      }
+      setAmountToAdd(''); // Clear the input field
+      setWalletError('');
+    } else {
+      setWalletError(response.message);
+    }
+  };
+
+  if (loading) return <p className="text-gray-600 text-center py-4">Loading user details...</p>;
+  if (error) return <p className="text-red-600 text-center py-4">{error}</p>;
+  if (!user) return <p className="text-gray-600 text-center py-4">User not found.</p>;
 
   return (
     <div className=''>
@@ -44,14 +113,14 @@ const UserProfileSidebar = ({ userId, onClose }) => {
             <div className="relative pt-16 flex justify-center">
               <div className="relative">
                 <img
-                  src={user.profileImage || "/placeholder.svg"}
+                  src={user.photos?.[0] || "/placeholder.svg"}
                   alt={user.name}
                   className="w-24 h-24 rounded-full cursor-pointer border-4 border-white shadow-lg object-cover"
                   onClick={() => setIsImageModalOpen(true)}
                 />
                 <span
                   className={`absolute bottom-1 right-1 w-4 h-4 rounded-full border-2 border-white ${
-                    user.status === "Live" ? "bg-green-500" : "bg-gray-400"
+                    user.isOnline ? "bg-green-500" : "bg-gray-400"
                   }`}
                 />
               </div>
@@ -60,7 +129,7 @@ const UserProfileSidebar = ({ userId, onClose }) => {
             <div className="text-center mt-4">
               <h2 className="text-xl font-semibold text-gray-800">{user.name}</h2>
               <p className="text-sm text-gray-600">{user.email}</p>
-              <p className="text-xs text-gray-500 mt-2">Status: {user.status}</p>
+              <p className="text-xs text-gray-500 mt-2">Status: {user.isOnline ? "Online" : "Offline"}</p>
             </div>
 
             <div className="mt-6 px-4 grid grid-cols-2 gap-3">
@@ -84,7 +153,7 @@ const UserProfileSidebar = ({ userId, onClose }) => {
           <div className="bg-gray-50 p-4 rounded-xl space-y-3">
             <div className="flex items-center text-gray-700">
               <span className="text-lg mr-2">📅</span>
-              <span>Birth Date: {user.dob}</span>
+              <span>Birth Date: {new Date(user.dob).toLocaleDateString()}</span>
             </div>
             <div className="flex items-center text-gray-700">
               <span className="text-lg mr-2">👤</span>
@@ -97,7 +166,6 @@ const UserProfileSidebar = ({ userId, onClose }) => {
           </div>
         </div>
       </div>
-                  <UserProfileSidebar />
 
       {/* Image Modal */}
       <Modal
@@ -126,33 +194,85 @@ const UserProfileSidebar = ({ userId, onClose }) => {
 
       {/* Wallet Modal */}
       <Modal
-        isOpen={isWalletModalOpen}
-        onClose={() => setIsWalletModalOpen(false)}
-        title="My Wallet"
-      >
-        <div className="space-y-4">
-          <div className="bg-green-50 p-4 rounded-lg">
-            <p className="text-sm text-green-600">Current Balance</p>
-            <p className="text-2xl font-bold text-green-700">${user.wallet.balance}</p>
+  isOpen={isWalletModalOpen}
+  onClose={() => setIsWalletModalOpen(false)}
+  title="My Wallet"
+>
+  <div className="space-y-4 p-4 sm:p-6">
+    {walletLoading ? (
+      <p className="text-gray-600 text-center py-4">Loading wallet data...</p>
+    ) : walletError ? (
+      <p className="text-red-600 text-center py-4">{walletError}</p>
+    ) : (
+      <>
+        <div className="bg-green-50 p-4 rounded-lg">
+          <p className="text-sm text-green-600">Current Balance</p>
+          <p className="text-2xl font-bold text-green-700">
+            ${walletData?.balance || 0}
+          </p>
+        </div>
+
+        {/* Add Money Section */}
+        <div className="bg-blue-50 p-4 rounded-lg">
+          <h4 className="text-lg font-semibold text-blue-600 mb-2">
+            Add Money to Wallet
+          </h4>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <input
+              type="number"
+              placeholder="Enter amount"
+              className="p-2 border rounded-lg w-full sm:w-auto"
+              value={amountToAdd}
+              onChange={(e) => setAmountToAdd(e.target.value)}
+            />
+            <button
+              onClick={handleAddMoney}
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 w-full sm:w-auto"
+            >
+              Add
+            </button>
           </div>
-          
-          <div className="space-y-3">
-            {user.wallet.transactions.map((transaction, index) => (
-              <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                <div>
-                  <p className="text-sm font-medium text-gray-800">{transaction.description}</p>
-                  <p className="text-xs text-gray-500">{transaction.date}</p>
+          {walletError && <p className="text-red-500 text-sm mt-2">{walletError}</p>}
+        </div>
+
+        {/* Transactions Section */}
+        <div className="space-y-3">
+          <h4 className="text-lg font-semibold text-gray-800">Transactions</h4>
+          <div className="max-h-60 overflow-y-scroll space-y-2 border rounded-lg p-2 bg-gray-50">
+            {walletData?.transactions?.length > 0 ? (
+              walletData.transactions.map((transaction, index) => (
+                <div
+                  key={index}
+                  className="flex justify-between items-center p-3 bg-white rounded-lg shadow-sm"
+                >
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">{transaction.title}</p>
+                    <p className="text-xs text-gray-500">{transaction.notes}</p>
+                    <p className="text-xs text-gray-500">
+                      {new Date(transaction.paymentDate).toLocaleString()}
+                    </p>
+                  </div>
+                  <p
+                    className={`text-sm font-semibold ${
+                      transaction.amount > 0 ? "text-green-600" : "text-red-600"
+                    }`}
+                  >
+                    {transaction.amount > 0
+                      ? `+$${transaction.amount}`
+                      : `-$${Math.abs(transaction.amount)}`}
+                  </p>
                 </div>
-                <p className={`text-sm font-semibold ${
-                  transaction.amount > 0 ? "text-green-600" : "text-red-600"
-                }`}>
-                  {transaction.amount > 0 ? `+$${transaction.amount}` : `-$${Math.abs(transaction.amount)}`}
-                </p>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-center text-gray-500 text-sm">No transactions yet.</p>
+            )}
           </div>
         </div>
-      </Modal>
+      </>
+    )}
+  </div>
+</Modal>
+
 
       {/* Reviews Modal */}
       <Modal

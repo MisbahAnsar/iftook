@@ -79,7 +79,7 @@ const UsersContent = ({ onUserClick }) => {
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm">
                       <button
-                        onClick={() => onUserClick(demoUser.id)} // Always pass dummy user ID
+                        onClick={() => onUserClick(user._id)} // Always pass dummy user ID
                         className="flex items-center px-3 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium shadow-sm transition"
                       >
                         <Eye className="h-4 w-4 mr-2" />
