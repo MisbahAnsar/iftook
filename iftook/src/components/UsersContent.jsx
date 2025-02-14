@@ -22,8 +22,32 @@ const UsersContent = ({ onUserClick }) => {
     fetchUsers();
   }, []);
 
-  if (loading) return <p className="text-gray-600 text-center py-4">Loading users...</p>;
-  if (error) return <p className="text-red-600 text-center py-4">{error}</p>;
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-gradient-to-br from-[#eef2ff] to-[#f8f9fc] p-6 rounded-2xl shadow-md space-y-6">
+          {/* Skeleton for Header */}
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-300 rounded w-1/2 mb-4"></div>
+            <div className="h-4 bg-gray-300 rounded w-1/3"></div>
+          </div>
+  
+          {/* Skeleton for Block Reason Input */}
+          <div className="animate-pulse">
+            <div className="h-4 bg-gray-300 rounded w-1/4 mb-2"></div>
+            <div className="h-20 bg-gray-300 rounded"></div>
+          </div>
+  
+          {/* Skeleton for Buttons */}
+          <div className="flex gap-2 animate-pulse">
+            <div className="h-10 bg-gray-300 rounded w-24"></div>
+            <div className="h-10 bg-gray-300 rounded w-24"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+    if (error) return <p className="text-red-600 text-center py-4">{error}</p>;
 
   return (
     <div className="bg-white rounded-xl shadow-md p-6">

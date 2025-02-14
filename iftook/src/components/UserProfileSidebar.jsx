@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Wallet, Star } from 'lucide-react';
 import Modal from './Modal';
-import { getAllUsers, getWalletData, addMoneyToWallet } from '../utils/api'; // Import new functions
+import { getAllUsers, getWalletData, addMoneyToWallet, updateOnlineStatus } from '../utils/api'; // Import new function
 
 const UserProfileSidebar = ({ userId, onClose }) => {
   const [user, setUser] = useState(null);
@@ -73,12 +73,12 @@ const UserProfileSidebar = ({ userId, onClose }) => {
   };
 
   const handleAddMoney = async () => {
-    if (!amountToAdd || isNaN(amountToAdd)) {
-      setWalletError("Please enter a valid amount.");
-      return;
-    }
+  if (!amountToAdd || isNaN(amountToAdd)) {
+    setWalletError("Please enter a valid amount.");
+    return;
+  }
 
-    const response = await addMoneyToWallet(Number(amountToAdd));
+    const response = await addMoneyToWallet(userId, Number(amountToAdd));
     if (response.success) {
       // Update wallet data after adding money
       const updatedWalletData = await getWalletData(userId);
@@ -92,7 +92,51 @@ const UserProfileSidebar = ({ userId, onClose }) => {
     }
   };
 
-  if (loading) return <p className="text-gray-600 text-center py-4">Loading user details...</p>;
+  // Handle profile image click to update online status
+  const handleProfileImageClick = async () => {
+    // const response = await updateOnlineStatus(userId);
+    // if (response.success) {
+    //   setUser(response.user); // Update the user's online status
+    // } else {
+    //   setError(response.message);
+    // }
+    setIsImageModalOpen(true); // Open the image modal
+  };
+
+  const handleStatusUpdate = async (status) => {
+    const response = await updateOnlineStatus(userId, status);
+    if (response.success) {
+      setUser(response.user); // Update the user's online status
+    } else {
+      setError(response.message);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-gradient-to-br from-[#eef2ff] to-[#f8f9fc] p-6 rounded-2xl shadow-md space-y-6">
+          {/* Skeleton for Header */}
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-300 rounded w-1/2 mb-4"></div>
+            <div className="h-4 bg-gray-300 rounded w-1/3"></div>
+          </div>
+  
+          {/* Skeleton for Block Reason Input */}
+          <div className="animate-pulse">
+            <div className="h-4 bg-gray-300 rounded w-1/4 mb-2"></div>
+            <div className="h-20 bg-gray-300 rounded"></div>
+          </div>
+  
+          {/* Skeleton for Buttons */}
+          <div className="flex gap-2 animate-pulse">
+            <div className="h-10 bg-gray-300 rounded w-24"></div>
+            <div className="h-10 bg-gray-300 rounded w-24"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
   if (error) return <p className="text-red-600 text-center py-4">{error}</p>;
   if (!user) return <p className="text-gray-600 text-center py-4">User not found.</p>;
 
@@ -116,7 +160,7 @@ const UserProfileSidebar = ({ userId, onClose }) => {
                   src={user.photos?.[0] || "/placeholder.svg"}
                   alt={user.name}
                   className="w-24 h-24 rounded-full cursor-pointer border-4 border-white shadow-lg object-cover"
-                  onClick={() => setIsImageModalOpen(true)}
+                  onClick={handleProfileImageClick} // Updated click handler
                 />
                 <span
                   className={`absolute bottom-1 right-1 w-4 h-4 rounded-full border-2 border-white ${
@@ -190,6 +234,27 @@ const UserProfileSidebar = ({ userId, onClose }) => {
             </div>
           ))}
         </div>
+        <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">Update Online Status</h3>
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleStatusUpdate(true)}
+                className={`px-4 py-2 rounded-lg transition-colors ${
+                  user.isOnline ? "bg-green-500 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
+              >
+                Online
+              </button>
+              <button
+                onClick={() => handleStatusUpdate(false)}
+                className={`px-4 py-2 rounded-lg transition-colors ${
+                  !user.isOnline ? "bg-red-500 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
+              >
+                Offline
+              </button>
+            </div>
+          </div>
       </Modal>
 
       {/* Wallet Modal */}
@@ -199,16 +264,12 @@ const UserProfileSidebar = ({ userId, onClose }) => {
   title="My Wallet"
 >
   <div className="space-y-4 p-4 sm:p-6">
-    {walletLoading ? (
-      <p className="text-gray-600 text-center py-4">Loading wallet data...</p>
-    ) : walletError ? (
-      <p className="text-red-600 text-center py-4">{walletError}</p>
-    ) : (
       <>
+        {/* Current Balance Section */}
         <div className="bg-green-50 p-4 rounded-lg">
           <p className="text-sm text-green-600">Current Balance</p>
           <p className="text-2xl font-bold text-green-700">
-            ${walletData?.balance || 0}
+          ₹{walletData?.balance || 0}
           </p>
         </div>
 
@@ -238,16 +299,20 @@ const UserProfileSidebar = ({ userId, onClose }) => {
         {/* Transactions Section */}
         <div className="space-y-3">
           <h4 className="text-lg font-semibold text-gray-800">Transactions</h4>
-          <div className="max-h-60 overflow-y-scroll space-y-2 border rounded-lg p-2 bg-gray-50">
+          <div className="h-60 overflow-y-auto border rounded-lg p-2 bg-gray-50">
             {walletData?.transactions?.length > 0 ? (
               walletData.transactions.map((transaction, index) => (
                 <div
                   key={index}
-                  className="flex justify-between items-center p-3 bg-white rounded-lg shadow-sm"
+                  className="flex justify-between items-center p-3 bg-white rounded-lg shadow-sm mb-2"
                 >
                   <div>
-                    <p className="text-sm font-medium text-gray-800">{transaction.title}</p>
-                    <p className="text-xs text-gray-500">{transaction.notes}</p>
+                    <p className="text-sm font-medium text-gray-800">
+                      {transaction.amount > 0 ? "Money Added" : "Money Withdrawn"}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {transaction.notes || "No additional notes"}
+                    </p>
                     <p className="text-xs text-gray-500">
                       {new Date(transaction.paymentDate).toLocaleString()}
                     </p>
@@ -258,8 +323,8 @@ const UserProfileSidebar = ({ userId, onClose }) => {
                     }`}
                   >
                     {transaction.amount > 0
-                      ? `+$${transaction.amount}`
-                      : `-$${Math.abs(transaction.amount)}`}
+                      ? `+₹${transaction.amount}`
+                      : `-₹${Math.abs(transaction.amount)}`}
                   </p>
                 </div>
               ))
@@ -269,10 +334,8 @@ const UserProfileSidebar = ({ userId, onClose }) => {
           </div>
         </div>
       </>
-    )}
   </div>
 </Modal>
-
 
       {/* Reviews Modal */}
       <Modal

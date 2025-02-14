@@ -1,3 +1,23 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom scrollbar styles */
+/* Custom scrollbar styling */
+.transactions-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.transactions-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.transactions-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.transactions-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

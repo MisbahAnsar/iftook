@@ -193,14 +193,15 @@ export const getWalletData = async (userId) => {
   };
   
   // Add Money to Wallet
-  export const addMoneyToWallet = async (amount) => {
+  // Add Money to Wallet
+export const addMoneyToWallet = async (userId, amount) => {
     try {
       const token = getAuthToken();
       if (!token) {
         return { success: false, message: "Not authorized - No token provided" };
       }
   
-      const response = await fetch(`${API_BASE_URL}/api/users/wallet/add`, {
+      const response = await fetch(`${API_BASE_URL}/api/users/wallet/add/${userId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -219,5 +220,181 @@ export const getWalletData = async (userId) => {
     } catch (error) {
       console.error("Error adding money to wallet:", error.message);
       return { success: false, message: "Network error. Please try again." };
+    }
+  };
+
+  // Fetch Payment Transactions
+export const getPaymentTransactions = async (userId) => {
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        return { success: false, message: "Not authorized - No token provided" };
+      }
+  
+      const response = await fetch(`${API_BASE_URL}/api/payments/all/${userId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        return { success: false, message: data.message || "Failed to fetch payment transactions" };
+      }
+  
+      return { success: true, transactions: data.transactions };
+    } catch (error) {
+      console.error("Error fetching payment transactions:", error.message);
+      return { success: false, message: "Network error. Please try again." };
+    }
+  };
+  
+  // Create a Payment
+  export const createPayment = async (paymentData) => {
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        return { success: false, message: "Not authorized - No token provided" };
+      }
+  
+      const response = await fetch(`${API_BASE_URL}/api/payments/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(paymentData),
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        return { success: false, message: data.message || "Failed to create payment" };
+      }
+  
+      return { success: true, payment: data.payment };
+    } catch (error) {
+      console.error("Error creating payment:", error.message);
+      return { success: false, message: "Network error. Please try again." };
+    }
+  };
+
+  // Block User
+export const blockUser = async (userId, blockReason) => {
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        return { success: false, message: "Not authorized - No token provided" };
+      }
+  
+      const response = await fetch(`${API_BASE_URL}/api/users/block/${userId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ blockReason }),
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        return { success: false, message: data.message || "Failed to block user" };
+      }
+  
+      return { success: true, message: data.message };
+    } catch (error) {
+      console.error("Error blocking user:", error.message);
+      return { success: false, message: "Network error. Please try again." };
+    }
+  };
+  
+  // Unblock User
+  export const unblockUser = async (userId) => {
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        return { success: false, message: "Not authorized - No token provided" };
+      }
+  
+      const response = await fetch(`${API_BASE_URL}/api/users/unblock/${userId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        return { success: false, message: data.message || "Failed to unblock user" };
+      }
+  
+      return { success: true, message: data.message };
+    } catch (error) {
+      console.error("Error unblocking user:", error.message);
+      return { success: false, message: "Network error. Please try again." };
+    }
+  };
+
+  // Update User Online Status
+export const updateOnlineStatus = async (userId) => {
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        return { success: false, message: "Not authorized - No token provided" };
+      }
+  
+      const response = await fetch(`${API_BASE_URL}/api/users/online-status/update/${userId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        return { success: false, message: data.message || "Failed to update online status" };
+      }
+  
+      return { success: true, user: data.user };
+    } catch (error) {
+      console.error("Error updating online status:", error.message);
+      return { success: false, message: "Network error. Please try again." };
+    }
+  };
+
+
+  export const getDashboardData = async () => {
+    try {
+      const token = getAuthToken(); // Assuming the token is stored in localStorage
+      if (!token) {
+        throw new Error('Not authorized - No token provided');
+      }
+  
+      const response = await fetch(`${API_BASE_URL}/api/dashboard/`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to fetch dashboard data');
+      }
+  
+      return data.data; // Return only the `data` part of the response
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error.message);
+      throw new Error(error.message || 'Network error. Please try again.');
     }
   };
