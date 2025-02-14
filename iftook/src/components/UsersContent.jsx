@@ -12,7 +12,8 @@ const UsersContent = ({ onUserClick }) => {
     const fetchUsers = async () => {
       const response = await getAllUsers();
       if (response.success) {
-        setUsers(response.users);
+        // Reverse the users array to display the most recent user first
+        setUsers(response.users.reverse());
       } else {
         setError(response.message);
       }
@@ -31,13 +32,13 @@ const UsersContent = ({ onUserClick }) => {
             <div className="h-8 bg-gray-300 rounded w-1/2 mb-4"></div>
             <div className="h-4 bg-gray-300 rounded w-1/3"></div>
           </div>
-  
+
           {/* Skeleton for Block Reason Input */}
           <div className="animate-pulse">
             <div className="h-4 bg-gray-300 rounded w-1/4 mb-2"></div>
             <div className="h-20 bg-gray-300 rounded"></div>
           </div>
-  
+
           {/* Skeleton for Buttons */}
           <div className="flex gap-2 animate-pulse">
             <div className="h-10 bg-gray-300 rounded w-24"></div>
@@ -47,7 +48,7 @@ const UsersContent = ({ onUserClick }) => {
       </div>
     );
   }
-    if (error) return <p className="text-red-600 text-center py-4">{error}</p>;
+  if (error) return <p className="text-red-600 text-center py-4">{error}</p>;
 
   return (
     <div className="bg-white rounded-xl shadow-md p-6">
