@@ -35,9 +35,9 @@ const Sidebar = ({ activeItem, setActiveItem, isMobileMenuOpen, setIsMobileMenuO
       >
         <div className="p-4 border-b">
           <img 
-            src="../assets/iftookimg.jpg"
+            src="https://sushistash.tushitgarg.com/api/images/BQACAgUAAxkDAANwZ68Eg62tFFWAC7oBAz6y0_gavvsAApATAALQjnhVeX-DQFHDd-M2BA"
             alt="Logo" 
-            className="h-16 w-auto rounded-md mx-auto object-contain" 
+            className="h-20 w-44 rounded-md mx-auto" 
           />
         </div>
         <nav className="mt-6 px-2">

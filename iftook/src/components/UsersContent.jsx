@@ -1,9 +1,44 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Eye } from "lucide-react";
 import { users } from "../data/users";
 
 const UsersContent = ({ onUserClick }) => {
-  const demoUser = users.find((user) => user.id === 1); // Replace with actual demo user ID
+  
+  const getAllUsers = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      // console.log("token", token);
+      if (!token) {
+        console.log("Not authorized - No token provided");
+        return;
+      }
+
+      const response = await fetch("https://iftook-backend.vercel.app/api/users/all", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.log("Failed to fetch users:", data.message || "Unknown error");
+        return;
+      }
+
+      console.log("Fetched users:", data.users);
+    } catch (error) {
+      console.error("Error fetching users:", error.message);
+    }
+  };
+
+  useEffect(() => {
+    getAllUsers();
+  }, []);
+
+  const demoUser = users.find((user) => user.id === 1);
 
   if (!demoUser) {
     return <p className="text-gray-600 text-center py-4">Demo user not found.</p>;
