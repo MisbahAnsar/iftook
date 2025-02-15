@@ -6,6 +6,7 @@ import MobileMenuButton from "./components/MobileMenuButton";
 import UserProfileSidebar from "./components/UserProfileSidebar";
 import LoginPage from "./pages/Login";
 import { isAuthenticated, logoutUser } from "./utils/api"; // Import auth utilities
+import UserProfilePage from "./pages/UserProfilePage";
 
 function App() {
   const [activeItem, setActiveItem] = useState("dashboard");
@@ -30,6 +31,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
+        <Route path="/userprofile/:userId" element={<UserProfilePage />} />
         <Route
           path="/*"
           element={

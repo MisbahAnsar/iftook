@@ -27,13 +27,6 @@ const UserProfileSidebar = ({ userId, onClose }) => {
         const foundUser = response.users.find((u) => u._id === userId);
         if (foundUser) {
           setUser(foundUser);
-          setReviews(foundUser.ratings || []);
-          setImages([
-            foundUser.photos?.[0] || "https://via.placeholder.com/40",
-            "https://source.unsplash.com/random/200x200?portrait",
-            "https://source.unsplash.com/random/200x200?person",
-            "https://source.unsplash.com/random/200x200?face"
-          ]);
         } else {
           setError('User not found');
         }
@@ -45,7 +38,6 @@ const UserProfileSidebar = ({ userId, onClose }) => {
 
     fetchUser();
   }, [userId]);
-
   // Fetch wallet data when the wallet modal is opened
   useEffect(() => {
     if (isWalletModalOpen) {

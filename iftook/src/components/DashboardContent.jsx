@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { getDashboardData } from "../utils/api"
-import { Users, UserCheck, UserMinus, UserX, CreditCard, Clock, CheckCircle, Loader2 } from "lucide-react"
+import { Users, UserCheck, UserMinus, UserX, CreditCard, Clock, CheckCircle, Loader2 } from 'lucide-react'
 
 const DashboardContent = () => {
   const [dashboardData, setDashboardData] = useState(null)
@@ -26,36 +26,21 @@ const DashboardContent = () => {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="bg-gradient-to-br from-[#eef2ff] to-[#f8f9fc] p-6 rounded-2xl shadow-md space-y-6">
-          {/* Skeleton for Header */}
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-300 rounded w-1/2 mb-4"></div>
-            <div className="h-4 bg-gray-300 rounded w-1/3"></div>
-          </div>
-  
-          {/* Skeleton for Block Reason Input */}
-          <div className="animate-pulse">
-            <div className="h-4 bg-gray-300 rounded w-1/4 mb-2"></div>
-            <div className="h-20 bg-gray-300 rounded"></div>
-          </div>
-  
-          {/* Skeleton for Buttons */}
-          <div className="flex gap-2 animate-pulse">
-            <div className="h-10 bg-gray-300 rounded w-24"></div>
-            <div className="h-10 bg-gray-300 rounded w-24"></div>
-          </div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin text-blue-500 mx-auto mb-4" />
+          <p className="text-gray-600">Loading dashboard data...</p>
         </div>
       </div>
-    );
+    )
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg flex items-center gap-2">
-          <span className="text-lg">⚠️</span>
-          {error}
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="bg-red-100 text-red-700 px-6 py-4 rounded-lg shadow-md flex items-center">
+          <span className="text-2xl mr-3">⚠️</span>
+          <p>{error}</p>
         </div>
       </div>
     )
@@ -63,28 +48,30 @@ const DashboardContent = () => {
 
   if (!dashboardData) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="bg-gray-50 text-gray-600 px-4 py-3 rounded-lg">No data available.</div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="bg-gray-100 text-gray-700 px-6 py-4 rounded-lg shadow-md">
+          No data available.
+        </div>
       </div>
     )
   }
 
   const StatCard = ({ title, value, icon: Icon, gradient }) => (
-    <div className={`relative overflow-hidden rounded-xl ${gradient} p-6 transition-transform hover:scale-[1.02]`}>
+    <div className={`relative overflow-hidden rounded-2xl ${gradient} p-6 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]`}>
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-white/80 font-medium mb-1">{title}</p>
+          <p className="text-white/90 font-medium mb-1">{title}</p>
           <p className="text-3xl font-bold text-white">{value}</p>
         </div>
-        <Icon className="w-6 h-6 text-white/80" />
+        <Icon className="w-8 h-8 text-white/80" />
       </div>
-      <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-white/10 rounded-full" />
+      <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-white/10 rounded-full" />
     </div>
   )
 
   return (
-    <div className="space-y-6 p-6 bg-gray-50/30">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <StatCard
           title="Total Users"
           value={dashboardData.totalUsers}
@@ -111,40 +98,30 @@ const DashboardContent = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-2 mb-4">
-            <CreditCard className="w-5 h-5 text-purple-500" />
-            <h3 className="font-semibold text-gray-800">Total Payments</h3>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+        {[
+          { title: "Total Payments", value: dashboardData.totalPayments, icon: CreditCard, color: "purple" },
+          { title: "Pending Payments", value: dashboardData.totalPendingPayments, icon: Clock, color: "yellow" },
+          { title: "Successful Payments", value: dashboardData.totalSuccessfulPayments, icon: CheckCircle, color: "green" },
+        ].map((item, index) => (
+          <div key={index} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-md">
+            <div className="flex items-center gap-3 mb-4">
+              <item.icon className={`w-6 h-6 text-${item.color}-500`} />
+              <h3 className="font-semibold text-gray-800">{item.title}</h3>
+            </div>
+            <p className={`text-3xl font-bold text-${item.color}-600`}>{item.value}</p>
           </div>
-          <p className="text-3xl font-bold text-purple-600">{dashboardData.totalPayments}</p>
-        </div>
-
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-2 mb-4">
-            <Clock className="w-5 h-5 text-yellow-500" />
-            <h3 className="font-semibold text-gray-800">Pending Payments</h3>
-          </div>
-          <p className="text-3xl font-bold text-yellow-600">{dashboardData.totalPendingPayments}</p>
-        </div>
-
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-2 mb-4">
-            <CheckCircle className="w-5 h-5 text-green-500" />
-            <h3 className="font-semibold text-gray-800">Successful Payments</h3>
-          </div>
-          <p className="text-3xl font-bold text-green-600">{dashboardData.totalSuccessfulPayments}</p>
-        </div>
+        ))}
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-6 border-b border-gray-100">
-          <h3 className="font-semibold text-gray-800">Recent Payments</h3>
+          <h3 className="font-semibold text-gray-800 text-lg">Recent Payments</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="bg-gray-50/50">
+              <tr className="bg-gray-50">
                 <th className="py-3 px-6 text-left text-sm font-medium text-gray-600">Title</th>
                 <th className="py-3 px-6 text-left text-sm font-medium text-gray-600">Amount</th>
                 <th className="py-3 px-6 text-left text-sm font-medium text-gray-600">Status</th>
@@ -153,7 +130,7 @@ const DashboardContent = () => {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {dashboardData.recentPayments.map((payment) => (
-                <tr key={payment._id} className="hover:bg-gray-50/50 transition-colors">
+                <tr key={payment._id} className="hover:bg-gray-50 transition-colors">
                   <td className="py-4 px-6 text-sm text-gray-600">{payment.title}</td>
                   <td className="py-4 px-6 text-sm font-medium text-gray-900">₹{payment.amount.toFixed(2)}</td>
                   <td className="py-4 px-6">
@@ -179,4 +156,3 @@ const DashboardContent = () => {
 }
 
 export default DashboardContent
-

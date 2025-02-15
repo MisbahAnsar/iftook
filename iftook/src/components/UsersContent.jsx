@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Eye } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { getAllUsers } from "../utils/api"; // Assuming getAllUsers is in api/auth.js
 import { users as dummyUsers } from "../data/users"; // Importing dummy data
 
@@ -7,6 +8,8 @@ const UsersContent = ({ onUserClick }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -104,8 +107,7 @@ const UsersContent = ({ onUserClick }) => {
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm">
                       <button
-                        onClick={() => onUserClick(user._id)} // Always pass dummy user ID
-                        className="flex items-center px-3 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium shadow-sm transition"
+onClick={() => navigate(`/userprofile/${user._id}`)} // Navigate to /profile/:userId                        className="flex items-center px-3 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium shadow-sm transition"
                       >
                         <Eye className="h-4 w-4 mr-2" />
                         View Details
