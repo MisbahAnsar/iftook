@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Wallet, Star } from 'lucide-react';
 import Modal from './Modal';
 import { getAllUsers, getWalletData, addMoneyToWallet, updateOnlineStatus } from '../utils/api'; // Import new function
+import { useNavigate } from 'react-router-dom';
 
 const UserProfileSidebar = ({ userId, onClose }) => {
   const [user, setUser] = useState(null);
@@ -20,7 +21,14 @@ const UserProfileSidebar = ({ userId, onClose }) => {
   const [walletError, setWalletError] = useState('');
   const [amountToAdd, setAmountToAdd] = useState('');
 
-  useEffect(() => {
+  const navigate = useNavigate();
+
+ useEffect(() => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    navigate('/login'); 
+    return;
+  }
     const fetchUser = async () => {
       const response = await getAllUsers();
       if (response.success) {
@@ -104,6 +112,14 @@ const UserProfileSidebar = ({ userId, onClose }) => {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // No need to store response
+    setUser(null);
+    setError("Logged out successfully");
+    window.location.reload(); // Refresh the page
+};
+
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -141,7 +157,7 @@ const UserProfileSidebar = ({ userId, onClose }) => {
       /> */}
 
       {/* Main Profile Sidebar */}
-      <div className="lg:fixed sm:top-0 sm:w-full sm:h-80 sm:flex lg:block lg:top-0 lg:left-0 lg:h-full lg:w-64 bg-white shadow-lg text-gray-800 z-[50] overflow-y-auto">
+      <div className="lg:fixed sm:top-0 sm:w-64 sm:h-full lg:block lg:top-0 lg:left-0 lg:h-full lg:w-64 bg-white shadow-lg text-gray-800 z-[50] overflow-y-auto">
         <div className="sticky top-0 z-[2] bg-white pb-4">
           <div className="relative">
             <div className="absolute top-0 left-0 w-full h-32 md:bg-gradient-to-r from-blue-500 to-purple-500 rounded-b-3xl"></div>
@@ -203,6 +219,8 @@ const UserProfileSidebar = ({ userId, onClose }) => {
         </div>
       </div>
 
+      <div className='text-white bg-red-500 border-2 flex items-center justify-center rounded-md mx-10 my-10 p-3 cursor-pointer' onClick={handleLogout}>Log Out</div>
+
       {/* Image Modal */}
       <Modal
         isOpen={isImageModalOpen}
@@ -256,76 +274,77 @@ const UserProfileSidebar = ({ userId, onClose }) => {
   title="My Wallet"
 >
   <div className="space-y-4 p-4 sm:p-6">
-      <>
-        {/* Current Balance Section */}
-        <div className="bg-green-50 p-4 rounded-lg">
-          <p className="text-sm text-green-600">Current Balance</p>
-          <p className="text-2xl font-bold text-green-700">
-          ₹{walletData?.balance || 0}
-          </p>
-        </div>
+    {/* Current Balance Section */}
+    <div className='flex sm:block'>
+    <div className="bg-green-50 p-4 rounded-lg">
+      <p className="text-sm text-green-600">Current Balance</p>
+      <p className="text-2xl font-bold text-green-700">
+        ₹{walletData?.balance || 0}
+      </p>
+    </div>
 
-        {/* Add Money Section */}
-        <div className="bg-blue-50 p-4 rounded-lg">
-          <h4 className="text-lg font-semibold text-blue-600 mb-2">
-            Add Money to Wallet
-          </h4>
-          <div className="flex flex-col sm:flex-row gap-2">
-            <input
-              type="number"
-              placeholder="Enter amount"
-              className="p-2 border rounded-lg w-full sm:w-auto"
-              value={amountToAdd}
-              onChange={(e) => setAmountToAdd(e.target.value)}
-            />
-            <button
-              onClick={handleAddMoney}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 w-full sm:w-auto"
+    {/* Add Money Section */}
+    <div className="bg-blue-50 p-4 rounded-lg">
+      <h4 className="text-lg font-semibold text-blue-600 mb-2">
+        Add Money to Wallet
+      </h4>
+      <div className="flex flex-col gap-2">
+        <input
+          type="number"
+          placeholder="Enter amount"
+          className="p-2 border rounded-lg w-full"
+          value={amountToAdd}
+          onChange={(e) => setAmountToAdd(e.target.value)}
+        />
+        <button
+          onClick={handleAddMoney}
+          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 w-full sm:w-auto"
+        >
+          Add
+        </button>
+      </div>
+      {walletError && <p className="text-red-500 text-sm mt-2">{walletError}</p>}
+    </div>
+    </div>
+    {/* Transactions Section */}
+    <div className="space-y-3">
+      <h4 className="text-lg font-semibold text-gray-800">Transactions</h4>
+      <div className="max-h-[300px] min-h-[150px] overflow-y-auto border rounded-lg p-2 bg-gray-50">
+        {walletData?.transactions?.length > 0 ? (
+          walletData.transactions.map((transaction, index) => (
+            <div
+              key={index}
+              className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 bg-white rounded-lg shadow-sm mb-2 gap-2"
             >
-              Add
-            </button>
-          </div>
-          {walletError && <p className="text-red-500 text-sm mt-2">{walletError}</p>}
-        </div>
-
-        {/* Transactions Section */}
-        <div className="space-y-3">
-          <h4 className="text-lg font-semibold text-gray-800">Transactions</h4>
-          <div className="h-60 overflow-y-auto border rounded-lg p-2 bg-gray-50">
-            {walletData?.transactions?.length > 0 ? (
-              walletData.transactions.map((transaction, index) => (
-                <div
-                  key={index}
-                  className="flex justify-between items-center p-3 bg-white rounded-lg shadow-sm mb-2"
-                >
-                  <div>
-                    <p className="text-sm font-medium text-gray-800">
-                      {transaction.amount > 0 ? "Money Added" : "Money Withdrawn"}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {transaction.notes || "No additional notes"}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {new Date(transaction.paymentDate).toLocaleString()}
-                    </p>
-                  </div>
-                  <p
-                    className={`text-sm font-semibold ${
-                      transaction.amount > 0 ? "text-green-600" : "text-red-600"
-                    }`}
-                  >
-                    {transaction.amount > 0
-                      ? `+₹${transaction.amount}`
-                      : `-₹${Math.abs(transaction.amount)}`}
-                  </p>
-                </div>
-              ))
-            ) : (
-              <p className="text-center text-gray-500 text-sm">No transactions yet.</p>
-            )}
-          </div>
-        </div>
-      </>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-800">
+                  {transaction.amount > 0 ? "Money Added" : "Money Withdrawn"}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {transaction.notes || "No additional notes"}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {new Date(transaction.paymentDate).toLocaleString()}
+                </p>
+              </div>
+              <p
+                className={`text-sm sm:text-base font-semibold ${
+                  transaction.amount > 0 ? "text-green-600" : "text-red-600"
+                }`}
+              >
+                {transaction.amount > 0
+                  ? `+₹${transaction.amount}`
+                  : `-₹${Math.abs(transaction.amount)}`}
+              </p>
+            </div>
+          ))
+        ) : (
+          <p className="text-center text-gray-500 text-sm py-4">
+            No transactions yet.
+          </p>
+        )}
+      </div>
+    </div>
   </div>
 </Modal>
 

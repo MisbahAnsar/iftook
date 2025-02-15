@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { User, CreditCard, MessageSquare, Activity, Users, Megaphone, Shield } from "lucide-react";
 import { getAllUsers, getUserMeetings, getFriendRequests, getFriendList, getPaymentTransactions, createPayment, blockUser, unblockUser } from "../utils/api"; // Import new functions
 import "react-calendar";
+import { Toaster, toast } from "react-hot-toast";
 import { Video, Phone } from 'lucide-react';
 const VideoIcon = Video;
 const PhoneIcon = Phone;
@@ -65,6 +66,8 @@ const UserDetails = ({ userId }) => {
           const foundUser = usersResponse.users.find((u) => u._id === userId);
           if (foundUser) {
             setUser(foundUser);
+            setIsBlocked(foundUser.isBlocked); // Set isBlocked based on the fetched data
+            setBlockReason(foundUser.blockReason || ""); // Set blockReason if available
           } else {
             setError("User not found");
           }
@@ -104,6 +107,45 @@ const UserDetails = ({ userId }) => {
 
     fetchUserData();
   }, [userId]);
+
+  // Handle Block User
+  const handleBlockUser = async () => {
+    if (blockReason) {
+      setRestrictError('User Blocked Successfully');
+      return;
+    }
+
+    try {
+      const response = await blockUser(userId, blockReason);
+
+      if (response.success) {
+        setIsBlocked(true); // Update the isBlocked state
+        setBlockReason(''); // Clear the block reason input
+        setRestrictError(''); // Clear any previous errors
+        toast.success("This is a success notification! 🎉");
+      } else {
+        setRestrictError(response.message);
+      }
+    } catch (error) {
+      setRestrictError(error.message);
+    }
+  };
+
+  // Handle Unblock User
+  const handleUnblockUser = async () => {
+    try {
+      const response = await unblockUser(userId);
+
+      if (response.success) {
+        setIsBlocked(false); // Update the isBlocked state
+        setRestrictError(''); // Clear any previous errors
+      } else {
+        setRestrictError(response.message);
+      }
+    } catch (error) {
+      setRestrictError(error.message);
+    }
+  };
 
   useEffect(() => {
     if (activeTab === "Payment") {
@@ -147,44 +189,6 @@ const UserDetails = ({ userId }) => {
       setPaymentError("");
     } else {
       setPaymentError(response.message);
-    }
-  };
-
-
-  const handleBlockUser = async () => {
-    if (!blockReason) {
-      setRestrictError('Please provide a reason for blocking.');
-      return;
-    }
-
-    try {
-      const response = await blockUser(userId, blockReason);
-
-      if (response.success) {
-        setIsBlocked(true); // Update the isBlocked state
-        setBlockReason(''); // Clear the block reason input
-        setRestrictError(''); // Clear any previous errors
-      } else {
-        setRestrictError(response.message);
-      }
-    } catch (error) {
-      setRestrictError(error.message);
-    }
-  };
-
-  // Handle unblock user
-  const handleUnblockUser = async () => {
-    try {
-      const response = await unblockUser(userId);
-
-      if (response.success) {
-        setIsBlocked(false); // Update the isBlocked state
-        setRestrictError(''); // Clear any previous errors
-      } else {
-        setRestrictError(response.message);
-      }
-    } catch (error) {
-      setRestrictError(error.message);
     }
   };
 
@@ -303,95 +307,142 @@ const UserDetails = ({ userId }) => {
       <h4 className="font-semibold text-2xl text-[#2a2e5b]">Talk Details</h4>
     </div>
 
-    {/* Upcoming Meetings */}
-    {meetings
-      .filter((meeting) => meeting.status === "waiting" || meeting.status === "ongoing")
-      .map((meeting) => (
-        <div
-          key={meeting._id}
-          className="bg-white/70 backdrop-blur-lg border border-[#c7d2fe] p-5 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300"
-        >
-          <div className="flex items-center justify-between">
-            <h5
-              className={`font-semibold text-lg ${
-                meeting.status === "ongoing" ? "text-[#047857]" : "text-[#d97706]"
-              }`}
-            >
-              {meeting.status === "ongoing" ? "Ongoing Meeting" : "Upcoming Meeting"}
-            </h5>
+    {/* Ongoing Meetings */}
+    {meetings.some((meeting) => meeting.status === "ongoing") && (
+      <div className="space-y-4">
+        <h5 className="font-semibold text-xl text-[#047857]">Ongoing Meetings</h5>
+        {meetings
+          .filter((meeting) => meeting.status === "ongoing")
+          .map((meeting) => (
             <div
-              className={`p-2 rounded-full ${
-                meeting.type === "video" ? "bg-blue-100" : "bg-purple-100"
-              }`}
+              key={meeting._id}
+              className="bg-white/70 backdrop-blur-lg border border-[#c7d2fe] p-5 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300"
             >
-              {meeting.type === "video" ? (
-                <VideoIcon className="w-5 h-5 text-blue-600" />
-              ) : (
-                <PhoneIcon className="w-5 h-5 text-purple-600" />
-              )}
+              <div className="flex items-center justify-between">
+              </div>
+              <div className="flex items-center gap-4 mt-3">
+                <img
+                  src={getUserPhoto(meeting.participant._id)}
+                  alt={meeting.participant.name}
+                  className="w-14 h-14 rounded-full border-2 border-[#c7d2fe] shadow-md"
+                />
+                <div>
+                  <p className="text-[#2a2e5b] font-medium">{meeting.participant.name}</p>
+                  <div className={`p-2 rounded-full flex gap-2 ${
+                            meeting.type === "video" ? "bg-blue-100" : "bg-purple-100"
+                          }`}
+                    >
+                          {meeting.type === "video" ? (
+                            <VideoIcon className="w-5 h-5 text-blue-600" />
+                          ) : (
+                            <PhoneIcon className="w-5 h-5 text-purple-600" />
+                          )}
+                            <p className="text-[#64748b] text-sm">{meeting.type}</p>
+                    </div>
+                </div>
+                <span className="ml-auto text-[#475569] text-sm">
+                  {new Date(meeting.scheduledTime).toLocaleString()}
+                </span>
+              </div>
+              <p className="text-[#2563eb] text-sm mt-2 font-semibold">
+                ₹{meeting.amount}
+              </p>
             </div>
-          </div>
-          <div className="flex items-center gap-4 mt-3">
-            <img
-              src={getUserPhoto(meeting.participant._id)} // Use participant's profile photo
-              alt={meeting.participant.name}
-              className="w-14 h-14 rounded-full border-2 border-[#c7d2fe] shadow-md"
-            />
-            <div>
-              <p className="text-[#2a2e5b] font-medium">{meeting.participant.name}</p>
-              <p className="text-[#64748b] text-sm">{meeting.type}</p>
+          ))}
+      </div>
+    )}
+
+    {/* Upcoming Meetings */}
+    {meetings.some((meeting) => meeting.status === "waiting") && (
+      <div className="space-y-4">
+        <h5 className="font-semibold text-xl text-[#d97706]">Upcoming Meetings</h5>
+        {meetings
+          .filter((meeting) => meeting.status === "waiting")
+          .map((meeting) => (
+            <div
+              key={meeting._id}
+              className="bg-white/70 backdrop-blur-lg border border-[#c7d2fe] p-5 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300"
+            >
+              <div className="flex items-center justify-between">
+              </div>
+              <div className="flex items-center gap-4 mt-3">
+                <img
+                  src={getUserPhoto(meeting.participant._id)}
+                  alt={meeting.participant.name}
+                  className="w-14 h-14 rounded-full border-2 border-[#c7d2fe] shadow-md"
+                />
+                <div>
+                  <p className="text-[#2a2e5b] font-medium">{meeting.participant.name}</p>
+                    <div className={`p-2 rounded-full flex gap-2 ${
+                            meeting.type === "video" ? "bg-blue-100" : "bg-purple-100"
+                          }`}
+                    >
+                          {meeting.type === "video" ? (
+                            <VideoIcon className="w-5 h-5 text-blue-600" />
+                          ) : (
+                            <PhoneIcon className="w-5 h-5 text-purple-600" />
+                          )}
+                          <p className="text-[#64748b] text-sm">{meeting.type}</p>
+                    </div>
+                </div>
+                <span className="ml-auto text-[#475569] text-sm">
+                  {new Date(meeting.scheduledTime).toLocaleString()}
+                </span>
+              </div>
+              <p className="text-[#2563eb] text-sm mt-2 font-semibold">
+                ₹{meeting.amount}
+              </p>
             </div>
-            <span className="ml-auto text-[#475569] text-sm">
-              {new Date(meeting.scheduledTime).toLocaleString()}
-            </span>
-          </div>
-          <p className="text-[#2563eb] text-sm mt-2 font-semibold">
-            ₹{meeting.amount}
-          </p>
-        </div>
-      ))}
+          ))}
+      </div>
+    )}
 
     {/* Previous Meetings */}
-    {meetings
-      .filter((meeting) => meeting.status === "completed")
-      .map((meeting) => (
-        <div
-          key={meeting._id}
-          className="bg-white/70 backdrop-blur-lg border border-[#c7d2fe] p-5 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300"
-        >
-          <div className="flex items-center justify-between">
-            <h5 className="text-[#b91c1c] font-semibold text-lg">Previous Meeting</h5>
+    {meetings.some((meeting) => meeting.status === "completed") && (
+      <div className="space-y-4">
+        <h5 className="font-semibold text-xl text-[#b91c1c]">Previous Meetings</h5>
+        {meetings
+          .filter((meeting) => meeting.status === "completed")
+          .map((meeting) => (
             <div
-              className={`p-2 rounded-full ${
-                meeting.type === "video" ? "bg-blue-100" : "bg-purple-100"
-              }`}
+              key={meeting._id}
+              className="bg-white/70 backdrop-blur-lg border border-[#c7d2fe] p-5 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300"
             >
-              {meeting.type === "video" ? (
-                <VideoIcon className="w-5 h-5 text-blue-600" />
-              ) : (
-                <PhoneIcon className="w-5 h-5 text-purple-600" />
-              )}
+              <div className="flex items-center justify-between">
+                <h5 className="text-[#b91c1c] font-semibold text-lg">Previous Meeting</h5>
+                <div
+                  className={`p-2 rounded-full ${
+                    meeting.type === "video" ? "bg-blue-100" : "bg-purple-100"
+                  }`}
+                >
+                  {meeting.type === "video" ? (
+                    <VideoIcon className="w-5 h-5 text-blue-600" />
+                  ) : (
+                    <PhoneIcon className="w-5 h-5 text-purple-600" />
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center gap-4 mt-3">
+                <img
+                  src={getUserPhoto(meeting.participant._id)}
+                  alt={meeting.participant.name}
+                  className="w-14 h-14 rounded-full border-2 border-[#c7d2fe] shadow-md"
+                />
+                <div>
+                  <p className="text-[#2a2e5b] font-medium">{meeting.participant.name}</p>
+                  <p className="text-[#64748b] text-sm">{meeting.type}</p>
+                </div>
+                <span className="ml-auto text-[#475569] text-sm">
+                  {new Date(meeting.scheduledTime).toLocaleString()}
+                </span>
+              </div>
+              <p className="text-[#2563eb] text-sm mt-2 font-semibold">
+                ₹{meeting.amount}
+              </p>
             </div>
-          </div>
-          <div className="flex items-center gap-4 mt-3">
-            <img
-              src={getUserPhoto(meeting.participant._id)} // Use participant's profile photo
-              alt={meeting.participant.name}
-              className="w-14 h-14 rounded-full border-2 border-[#c7d2fe] shadow-md"
-            />
-            <div>
-              <p className="text-[#2a2e5b] font-medium">{meeting.participant.name}</p>
-              <p className="text-[#64748b] text-sm">{meeting.type}</p>
-            </div>
-            <span className="ml-auto text-[#475569] text-sm">
-              {new Date(meeting.scheduledTime).toLocaleString()}
-            </span>
-          </div>
-          <p className="text-[#2563eb] text-sm mt-2 font-semibold">
-            ₹{meeting.amount}
-          </p>
-        </div>
-      ))}
+          ))}
+      </div>
+    )}
   </div>
 )}
 
@@ -571,59 +622,6 @@ const UserDetails = ({ userId }) => {
               ))}
             </div>
           </div>
-
-          {/* Create Payment Form */}
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <h4 className="text-lg font-semibold text-blue-600 mb-2">Create New Payment</h4>
-            <div className="space-y-3">
-              <input
-                type="text"
-                placeholder="Receiver ID (optional)"
-                className="p-2 border rounded-lg w-full"
-                value={newPayment.receiver}
-                onChange={(e) => setNewPayment({ ...newPayment, receiver: e.target.value })}
-              />
-              <input
-                type="number"
-                placeholder="Amount"
-                className="p-2 border rounded-lg w-full"
-                value={newPayment.amount}
-                onChange={(e) => setNewPayment({ ...newPayment, amount: e.target.value })}
-              />
-              <select
-                className="p-2 border rounded-lg w-full"
-                value={newPayment.paymentType}
-                onChange={(e) => setNewPayment({ ...newPayment, paymentType: e.target.value })}
-              >
-                <option value="">Select Payment Type</option>
-                <option value="earning">Earning</option>
-                <option value="withdrawal">Withdrawal</option>
-                <option value="refund">Refund</option>
-                <option value="wallet_deposit">Wallet Deposit</option>
-                <option value="wallet_payment">Wallet Payment</option>
-              </select>
-              <input
-                type="text"
-                placeholder="Title"
-                className="p-2 border rounded-lg w-full"
-                value={newPayment.title}
-                onChange={(e) => setNewPayment({ ...newPayment, title: e.target.value })}
-              />
-              <textarea
-                placeholder="Notes (optional)"
-                className="p-2 border rounded-lg w-full"
-                value={newPayment.notes}
-                onChange={(e) => setNewPayment({ ...newPayment, notes: e.target.value })}
-              />
-              <button
-                onClick={handleCreatePayment}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-              >
-                Create Payment
-              </button>
-              {paymentError && <p className="text-red-500 text-sm mt-2">{paymentError}</p>}
-            </div>
-          </div>
         </>
       )}
     </div>
@@ -632,92 +630,61 @@ const UserDetails = ({ userId }) => {
 
 {/* // Restrict User Tab */}
 <div className="space-y-6">
-  {activeTab === "Restrict User" && (
-    <div className="bg-gradient-to-br from-[#eef2ff] to-[#f8f9fc] p-6 rounded-2xl shadow-md space-y-6">
-      {loading ? (
-        // Skeleton Loader for Restrict User Tab
-        <div className="animate-pulse space-y-6">
-          {/* Skeleton for Header */}
-          <div>
-            <div className="h-8 bg-gray-300 rounded w-1/2 mb-4"></div>
-            <div className="h-4 bg-gray-300 rounded w-1/3"></div>
-          </div>
+          {activeTab === "Restrict User" && (
+            <div className="bg-gradient-to-br from-[#eef2ff] to-[#f8f9fc] p-6 rounded-2xl shadow-md space-y-6">
+              {/* Block/Unblock Section */}
+              <div>
+                <h4 className="font-semibold text-2xl text-[#2a2e5b]">Restrict User</h4>
+                <p className="text-[#4a5568] text-sm">
+                  {isBlocked
+                    ? "This user is currently blocked."
+                    : "This user is not blocked."}
+                </p>
+              </div>
 
-          {/* Skeleton for Block Reason Input */}
-          <div>
-            <div className="h-4 bg-gray-300 rounded w-1/4 mb-2"></div>
-            <div className="h-20 bg-gray-300 rounded"></div>
-          </div>
+              {/* Show Block Reason if User is Blocked */}
+              {isBlocked && (
+                <div className="bg-yellow-100 p-4 rounded-lg">
+                  <p className="text-sm text-yellow-800">
+                    <span className="font-semibold">Block Reason:</span> {blockReason}
+                  </p>
+                </div>
+              )}
 
-          {/* Skeleton for Buttons */}
-          <div className="flex gap-2">
-            <div className="h-10 bg-gray-300 rounded w-24"></div>
-            <div className="h-10 bg-gray-300 rounded w-24"></div>
-          </div>
-        </div>
-      ) : (
-        // Restrict User Content
-        <>
-          {/* Block/Unblock Section */}
-          <div>
-            <h4 className="font-semibold text-2xl text-[#2a2e5b]">Restrict User</h4>
-            <p className="text-[#4a5568] text-sm">
-              {isBlocked
-                ? "This user is currently blocked."
-                : "This user is not blocked."}
-            </p>
-          </div>
+              {/* Block Reason Input (Only for Unblocked Users) */}
+              {!isBlocked && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Reason for Blocking (optional)
+                  </label>
+                  <textarea
+                    className="w-full p-2 border rounded-lg text-gray-900 resize-none"
+                    placeholder="Enter reason for blocking..."
+                    value={blockReason}
+                    onChange={(e) => setBlockReason(e.target.value)}
+                  />
+                </div>
+              )}
 
-          {/* Block Reason Input */}
-          {!isBlocked && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Reason for Blocking (optional)
-              </label>
-              <textarea
-                className="w-full p-2 border rounded-lg text-gray-900 resize-none"
-                placeholder="Enter reason for blocking..."
-                value={blockReason}
-                onChange={(e) => setBlockReason(e.target.value)}
-              />
+              {/* Single Button for Block/Unblock */}
+              <button
+                onClick={isBlocked ? handleUnblockUser : handleBlockUser}
+                className={`px-4 py-2 text-white rounded-lg transition-colors ${
+                  isBlocked
+                    ? 'bg-green-500 hover:bg-green-600'
+                    : 'bg-red-500 hover:bg-red-600'
+                }`}
+              >
+                {isBlocked ? "Unblock User" : "Block User"}
+              </button>
+
+              {/* Error Message */}
+              {restrictError && (
+                <p className="text-red-500 text-sm mt-2">{restrictError}</p>
+              )}
             </div>
           )}
-
-          {/* Block/Unblock Buttons */}
-          <div className="flex gap-2">
-            <button
-              onClick={handleBlockUser}
-              disabled={isBlocked} // Disable if user is already blocked
-              className={`px-4 py-2 text-white rounded-lg transition-colors ${
-                isBlocked
-                  ? 'bg-gray-400'
-                  : 'bg-red-500 hover:bg-red-600'
-              }`}
-            >
-              Block User
-            </button>
-            <button
-              onClick={handleUnblockUser}
-              disabled={!isBlocked} // Disable if user is not blocked
-              className={`px-4 py-2 text-white rounded-lg transition-colors ${
-                !isBlocked
-                  ? 'bg-gray-400'
-                  : 'bg-green-500 hover:bg-green-600'
-              }`}
-            >
-              Unblock User
-            </button>
-          </div>
-
-          {/* Error Message */}
-          {restrictError && (
-            <p className="text-red-500 text-sm mt-2">{restrictError}</p>
-          )}
-        </>
-      )}
-    </div>
-  )}
-</div>
+        </div>
 
 
 
