@@ -1,5 +1,5 @@
 import React from "react";
-import { LayoutDashboard, Users, Menu, MessagesSquare, IndianRupee, User, Star } from "lucide-react";
+import { LayoutDashboard, Users, Menu, MessagesSquare, IndianRupee, User, Star, Settings, HelpingHand, IndianRupeeIcon } from "lucide-react";
 
 const menuItems = [
   { id: "dashboard", icon: <LayoutDashboard size={20} />, label: "Dashboard" },
@@ -8,6 +8,9 @@ const menuItems = [
   { id: "chats", icon: <MessagesSquare size={20} />, label: "Chats" },
   { id: "promote", icon: <User size={20} />, label: "Promoted Profile" },
   { id: "review", icon: <Star size={20} />, label: "Ratings & Reviews" },
+  { id: "settings", icon: <Settings size={20} />, label: "General Settings" },
+  { id: "support", icon: <HelpingHand size={20} />, label: "Support" },
+  { id: "taxes", icon: <IndianRupeeIcon size={20} />, label: "Taxes" },
 ];
 
 const Sidebar = ({ activeItem, setActiveItem, isMobileMenuOpen, setIsMobileMenuOpen }) => {
