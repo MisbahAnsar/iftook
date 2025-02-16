@@ -4,6 +4,7 @@ import { getAllUsers, getUserMeetings, getFriendRequests, getFriendList, getPaym
 import "react-calendar";
 import { Toaster, toast } from "react-hot-toast";
 import { Video, Phone } from 'lucide-react';
+import { users as dummyUsers } from "../data/users";
 const VideoIcon = Video;
 const PhoneIcon = Phone;
 
@@ -29,7 +30,7 @@ const TabButton = ({ active, children, onClick, icon: Icon }) => (
   </button>
 );
 
-const UserDetails = ({ userId }) => {
+const UserDetails = ({ userId, uid }) => {
   const [user, setUser] = useState(null);
   const [meetings, setMeetings] = useState([]);
   const [allUsers, setAllUsers] = useState([]); // Store all users for profile photos
@@ -56,6 +57,8 @@ const UserDetails = ({ userId }) => {
     title: "",
     notes: "",
   });
+
+  const dumUser = dummyUsers.find((u) => u.id === 1);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -444,6 +447,43 @@ const UserDetails = ({ userId }) => {
           ))}
       </div>
     )}
+  </div>
+)}
+
+{activeTab === "Promote Profile" && dumUser && (
+  <div className="bg-gradient-to-br from-[#eef2ff] to-[#f8f9fc] p-6 rounded-2xl shadow-md space-y-6">
+    {/* Promote Profile Section */}
+    <div>
+      <h4 className="font-semibold text-2xl text-[#2a2e5b]">Promote Profile</h4>
+      <div className="p-4 bg-white/60 backdrop-blur-lg border border-[#c7d2fe] rounded-lg shadow-lg mt-4">
+        <p className="text-lg text-[#475569] font-medium">
+          Package:{" "}
+          <span className="font-semibold text-[#1e40af]">
+            {dumUser.promoteProfile.package}
+          </span>
+        </p>
+        <p className="text-sm text-[#475569] mt-2">
+          Duration:{" "}
+          <span className="font-semibold text-[#1e40af]">
+            {dumUser.promoteProfile.startDate} - {dumUser.promoteProfile.endDate}
+          </span>
+        </p>
+        <div className="flex justify-between items-center mt-4">
+          <div className="text-center">
+            <p className="text-sm text-[#475569]">Views</p>
+            <p className="text-lg font-semibold text-[#1e40af]">
+              {dumUser.promoteProfile.views}
+            </p>
+          </div>
+          <div className="text-center">
+            <p className="text-sm text-[#475569]">Clicks</p>
+            <p className="text-lg font-semibold text-[#1e40af]">
+              {dumUser.promoteProfile.clicks}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 )}
 
