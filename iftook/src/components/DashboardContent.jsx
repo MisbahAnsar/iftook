@@ -71,15 +71,15 @@ const DashboardContent = () => {
   }
 
   const StatCard = ({ title, value, icon: Icon, gradient }) => (
-    <div className={`relative overflow-hidden rounded-2xl ${gradient} p-6 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]`}>
+    <div className={`relative overflow-hidden rounded-2xl border-2 shadow-lg p-6 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]`}>
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-white/90 font-medium mb-1">{title}</p>
-          <p className="text-3xl font-bold text-white">{value}</p>
+          <p className="text-black font-medium mb-1">{title}</p>
+          <p className="text-3xl font-bold text-black">{value}</p>
         </div>
-        <Icon className="w-8 h-8 text-white/80" />
+        <Icon className="w-8 h-8 text-black" />
       </div>
-      <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-white/10 rounded-full" />
+      <div className="absolute -right-8 -bottom-8 w-32 h-12 bg-black/10 rounded-full" />
     </div>
   );
 
@@ -91,7 +91,7 @@ const DashboardContent = () => {
           title="Total Users"
           value={dashboardData.totalUsers}
           icon={Users}
-          gradient="bg-gradient-to-br from-blue-500 to-blue-600"
+          gradient="bg-gradient-to-br from-blue-500 to-white-600"
         />
         <StatCard
           title="Online Users"
