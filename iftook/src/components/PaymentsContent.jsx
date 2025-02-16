@@ -68,8 +68,8 @@ const PaymentsContent = () => {
         <TableContainer component={Paper} sx={{ mb: 2, overflowX: 'auto', borderRadius: 2, boxShadow: 3 }}>
           <Table size={isMobile ? 'small' : 'medium'}>
             <TableHead>
-              <TableRow sx={{ bgcolor: theme.palette.primary.light }}>
-                <TableCell sx={{ fontWeight: 'bold' }}>Sender</TableCell>
+            <TableRow sx={{ bgcolor: theme.palette.grey[300] }}>
+            <TableCell sx={{ fontWeight: 'bold' }}>Sender</TableCell>
                 {title === 'Wallet Transactions' && <TableCell sx={{ fontWeight: 'bold' }}>Receiver</TableCell>}
                 <TableCell sx={{ fontWeight: 'bold' }}>Amount</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
