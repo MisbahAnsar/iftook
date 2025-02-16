@@ -497,3 +497,31 @@ export const getUserReviews = async (userId) => {
     return { success: false, message: 'Network error. Please try again.' };
   }
 };
+
+export const getReviewsData = async () => {
+  try {
+    const token = getAuthToken(); // Assuming you have a function to get the auth token
+    if (!token) {
+      throw new Error('Not authorized - No token provided');
+    }
+
+    const response = await fetch(`${API_BASE_URL}/api/users/dashboard/reviews`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to fetch reviews data');
+    }
+
+    return data; // Return the entire response data
+  } catch (error) {
+    console.error('Error fetching reviews data:', error.message);
+    throw new Error(error.message || 'Network error. Please try again.');
+  }
+};

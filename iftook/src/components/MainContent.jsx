@@ -8,6 +8,7 @@ import { Menu } from "lucide-react";
 import ChatContent from "./ChatContent";
 import PaymentsContent from "./PaymentsContent";
 import PromotedProfileContent from "./PromotedProfileContent";
+import ReviewContent from "./ReviewContent";
 
 const DefaultContent = ({ title }) => (
   <div className="bg-white rounded-lg shadow-md p-6">
@@ -40,6 +41,8 @@ const MainContent = ({ activeItem, selectedUserId, setSelectedUserId }) => {
         return <PaymentsContent />;
       case "promote":
         return <PromotedProfileContent />;
+      case "review":
+        return <ReviewContent />;
       default:
         return <DefaultContent title={activeItem.charAt(0).toUpperCase() + activeItem.slice(1)} />;
     }
