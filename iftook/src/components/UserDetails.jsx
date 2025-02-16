@@ -47,6 +47,18 @@ const UserDetails = ({ userId, uid }) => {
   const [isBlocked, setIsBlocked] = useState(false);
   const [blockReason, setBlockReason] = useState("");
   const [restrictError, setRestrictError] = useState("");
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
+
+  // Filter transactions based on search query (notes) and selected date
+  const filteredTransactions = paymentTransactions.filter((transaction) => {
+    const matchesSearch = transaction.notes.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesDate = selectedDate
+      ? new Date(transaction.paymentDate).toISOString().split("T")[0] === selectedDate
+      : true;
+    return matchesSearch && matchesDate;
+  });
   
 
   const [newPayment, setNewPayment] = useState({
@@ -596,78 +608,94 @@ const UserDetails = ({ userId, uid }) => {
 
 {/* //Payment Tab */}
 <div className="space-y-6">
-  {activeTab === "Payment" && (
-    <div className="bg-gradient-to-br from-[#eef2ff] to-[#f8f9fc] p-6 rounded-2xl shadow-md space-y-6">
-      {paymentLoading ? (
-        // Skeleton Loader for Payment Tab
-        <div className="animate-pulse space-y-6">
-          {/* Skeleton for Payment Transactions Header */}
-          <div>
-            <div className="h-8 bg-gray-300 rounded w-1/2 mb-4"></div>
-          </div>
-
-          {/* Skeleton for Payment Transactions List */}
-          <div className="space-y-3">
-            {[1, 2, 3].map((_, index) => (
-              <div key={index} className="bg-white/70 backdrop-blur-lg border border-[#c7d2fe] p-4 rounded-lg shadow-lg">
-                <div className="flex justify-between items-center">
-                  <div className="space-y-2">
-                    <div className="h-4 bg-gray-300 rounded w-3/4"></div>
-                    <div className="h-3 bg-gray-300 rounded w-1/2"></div>
-                    <div className="h-3 bg-gray-300 rounded w-1/3"></div>
+      {activeTab === "Payment" && (
+        <div className="bg-gradient-to-br from-[#eef2ff] to-[#f8f9fc] p-6 rounded-2xl shadow-md space-y-6">
+          {paymentLoading ? (
+            // Skeleton Loader for Payment Tab
+            <div className="animate-pulse space-y-6">
+              <div className="h-8 bg-gray-300 rounded w-1/2 mb-4"></div>
+              <div className="space-y-3">
+                {[1, 2, 3].map((_, index) => (
+                  <div
+                    key={index}
+                    className="bg-white/70 backdrop-blur-lg border border-[#c7d2fe] p-4 rounded-lg shadow-lg"
+                  >
+                    <div className="flex justify-between items-center">
+                      <div className="space-y-2">
+                        <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                        <div className="h-3 bg-gray-300 rounded w-1/2"></div>
+                        <div className="h-3 bg-gray-300 rounded w-1/3"></div>
+                      </div>
+                      <div className="h-4 bg-gray-300 rounded w-1/4"></div>
+                    </div>
                   </div>
-                  <div className="h-4 bg-gray-300 rounded w-1/4"></div>
+                ))}
+              </div>
+            </div>
+          ) : paymentError ? (
+            <p className="text-red-600 text-center py-4">{paymentError}</p>
+          ) : (
+            <>
+              {/* Payment Transactions */}
+              <div>
+                <h4 className="font-semibold text-2xl text-[#2a2e5b]">Payment Transactions</h4>
+
+                {/* Search & Filter Section */}
+                <div className="flex gap-4 mt-4">
+                  {/* Search by Notes */}
+                  <input
+                    type="text"
+                    placeholder="Search by notes..."
+                    className="w-full p-2 border border-[#c7d2fe] rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+
+                  {/* Filter by Date */}
+                  <input
+                    type="date"
+                    className="p-2 border border-[#c7d2fe] rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                  />
+                </div>
+
+                {/* Transactions List */}
+                <div className="space-y-3 mt-4">
+                  {filteredTransactions.length > 0 ? (
+                    filteredTransactions.map((transaction) => (
+                      <div
+                        key={transaction._id}
+                        className="bg-white/70 backdrop-blur-lg border border-[#c7d2fe] p-4 rounded-lg shadow-lg"
+                      >
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <p className="text-sm font-medium text-[#2a2e5b]">{transaction.title}</p>
+                            <p className="text-xs text-[#64748b]">{transaction.notes}</p>
+                            <p className="text-xs text-[#64748b]">
+                              {new Date(transaction.paymentDate).toLocaleString()}
+                            </p>
+                          </div>
+                          <p
+                            className={`text-sm font-semibold ${
+                              transaction.amount > 0 ? "text-green-600" : "text-red-600"
+                            }`}
+                          >
+                            {transaction.amount > 0 ? `+₹${transaction.amount}` : `-₹${Math.abs(transaction.amount)}`}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-center text-gray-500 mt-4">No transactions found.</p>
+                  )}
                 </div>
               </div>
-            ))}
-          </div>
-
-          {/* Skeleton for Create Payment Form */}
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <div className="h-6 bg-gray-300 rounded w-1/3 mb-4"></div>
-            <div className="space-y-3">
-              <div className="h-10 bg-gray-300 rounded"></div>
-              <div className="h-10 bg-gray-300 rounded"></div>
-              <div className="h-10 bg-gray-300 rounded"></div>
-              <div className="h-10 bg-gray-300 rounded"></div>
-              <div className="h-20 bg-gray-300 rounded"></div>
-              <div className="h-10 bg-gray-300 rounded"></div>
-            </div>
-          </div>
+            </>
+          )}
         </div>
-      ) : paymentError ? (
-        // Error Message
-        <p className="text-red-600 text-center py-4">{paymentError}</p>
-      ) : (
-        // Payment Content
-        <>
-          {/* Payment Transactions */}
-          <div>
-            <h4 className="font-semibold text-2xl text-[#2a2e5b]">Payment Transactions</h4>
-            <div className="space-y-3">
-              {paymentTransactions.map((transaction) => (
-                <div key={transaction._id} className="bg-white/70 backdrop-blur-lg border border-[#c7d2fe] p-4 rounded-lg shadow-lg">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="text-sm font-medium text-[#2a2e5b]">{transaction.title}</p>
-                      <p className="text-xs text-[#64748b]">{transaction.notes}</p>
-                      <p className="text-xs text-[#64748b]">{new Date(transaction.paymentDate).toLocaleString()}</p>
-                    </div>
-                    <p className={`text-sm font-semibold ${
-                      transaction.amount > 0 ? "text-green-600" : "text-red-600"
-                    }`}>
-                      {transaction.amount > 0 ? `+₹${transaction.amount}` : `-₹${Math.abs(transaction.amount)}`}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </>
       )}
     </div>
-  )}
-</div>
 
 {/* // Restrict User Tab */}
 <div className="space-y-6">
