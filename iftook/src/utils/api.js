@@ -371,7 +371,7 @@ export const updateOnlineStatus = async (userId) => {
   };
 
 
-  export const getDashboardData = async () => {
+export const getDashboardData = async () => {
     try {
       const token = getAuthToken(); // Assuming the token is stored in localStorage
       if (!token) {
@@ -398,3 +398,102 @@ export const updateOnlineStatus = async (userId) => {
       throw new Error(error.message || 'Network error. Please try again.');
     }
   };
+
+  // api.js
+export const fetchChatRoomData = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/chat-room/dashboard/all`);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching chat room data:', error);
+    throw error;
+  }
+};
+
+export const fetchPaymentsData = async () => {
+  try {
+    const token = getAuthToken();
+    if (!token) {
+      return { success: false, message: "Not authorized - No token provided" };
+    }
+
+    const response = await fetch(`${API_BASE_URL}/api/payments/all/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return { success: false, message: data.message || "Failed to fetch payments data" };
+    }
+
+    return { success: true, data: data.data };
+  } catch (error) {
+    console.error("Error fetching payments data:", error.message);
+    return { success: false, message: "Network error. Please try again." };
+  }
+};
+
+export const getPromotedUsers = async () => {
+  try {
+    const token = getAuthToken();
+    if (!token) {
+      return { success: false, message: "Not authorized - No token provided" };
+    }
+
+      const response = await fetch(`${API_BASE_URL}/api/users/promote/all`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { success: false, message: data.message || "Failed to fetch payments data" };
+      }
+  
+      return { success: true, data: data.users };  
+    }catch (error) {
+      console.error("Error fetching payments data:", error.message);
+      return { success: false, message: "Network error. Please try again." };
+    }
+};
+
+export const getUserReviews = async (userId) => {
+  try {
+    const token = getAuthToken();
+    if (!token) {
+      return { success: false, message: 'Not authorized - No token provided' };
+    }
+
+    const response = await fetch(`${API_BASE_URL}/api/users/reviews/${userId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return { success: false, message: data.message || 'Failed to fetch reviews' };
+    }
+
+    return { success: true, data: data.data }; // Ensure `data` contains `reviews` and `averageRating`
+  } catch (error) {
+    console.error('Error fetching reviews:', error.message);
+    return { success: false, message: 'Network error. Please try again.' };
+  }
+};

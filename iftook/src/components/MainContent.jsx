@@ -5,6 +5,9 @@ import UserDetails from "./UserDetails";
 import UserProfileSidebar from "./UserProfileSidebar";
 import { menuItems } from "./Sidebar";
 import { Menu } from "lucide-react";
+import ChatContent from "./ChatContent";
+import PaymentsContent from "./PaymentsContent";
+import PromotedProfileContent from "./PromotedProfileContent";
 
 const DefaultContent = ({ title }) => (
   <div className="bg-white rounded-lg shadow-md p-6">
@@ -31,6 +34,12 @@ const MainContent = ({ activeItem, selectedUserId, setSelectedUserId }) => {
         return <DashboardContent />;
       case "users":
         return <UsersContent onUserClick={setSelectedUserId} />;
+      case "chats":
+        return <ChatContent />;
+      case "payments":
+        return <PaymentsContent />;
+      case "promote":
+        return <PromotedProfileContent />;
       default:
         return <DefaultContent title={activeItem.charAt(0).toUpperCase() + activeItem.slice(1)} />;
     }
@@ -38,21 +47,10 @@ const MainContent = ({ activeItem, selectedUserId, setSelectedUserId }) => {
 
   return (
     <div className="lg:ml-64 min-h-screen bg-gray-100 relative">
-      {/* Conditional Button to Open Sidebar */}
-      {/* {showButton && (
-        <button
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="fixed lg:hidden top-4 left-4 z-50 bg-blue-500 text-white p-2 rounded-lg shadow-lg hover:bg-blue-600 transition"
-        >
-          <Menu size={24} />
-        </button>
-      )} */}
-
-      {/* Sidebar */}
       {isSidebarOpen && <UserProfileSidebar userId={selectedUserId} />}
 
       <div className="p-8">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+        <h2 className="text-2xl font-semibold text-gray-900 mb-6 mt-10">
           {menuItems.find((item) => item.id === activeItem)?.label}
         </h2>
         {renderContent()}

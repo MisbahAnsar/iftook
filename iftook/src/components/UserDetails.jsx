@@ -46,6 +46,7 @@ const UserDetails = ({ userId }) => {
   const [isBlocked, setIsBlocked] = useState(false);
   const [blockReason, setBlockReason] = useState("");
   const [restrictError, setRestrictError] = useState("");
+  
 
   const [newPayment, setNewPayment] = useState({
     sender: userId,
@@ -292,7 +293,7 @@ const UserDetails = ({ userId }) => {
                       className="p-4 bg-white/60 backdrop-blur-lg border border-[#c7d2fe] rounded-lg shadow-lg"
                     >
                       <p className="text-sm text-[#475569] capitalize">{key}</p>
-                      <p className="font-semibold text-lg text-[#1e40af]">₹{value}  <sub>/15mins</sub></p>
+                      <p className="font-semibold text-lg text-[#1e40af]">₹{value} <span className="text-md">/15mins</span></p>
                     </div>
                   ))}
                 </div>

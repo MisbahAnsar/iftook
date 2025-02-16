@@ -1,13 +1,23 @@
 import React from "react";
-import { LayoutDashboard, Users, BarChart3, Menu } from "lucide-react";
+import { LayoutDashboard, Users, Menu, MessagesSquare, IndianRupee } from "lucide-react";
 
 const menuItems = [
   { id: "dashboard", icon: <LayoutDashboard size={20} />, label: "Dashboard" },
   { id: "users", icon: <Users size={20} />, label: "Users" },
-  { id: "analytics", icon: <BarChart3 size={20} />, label: "Analytics" },
+  { id: "payments", icon: <IndianRupee size={20} />, label: "Payments" },
+  { id: "chats", icon: <MessagesSquare size={20} />, label: "Chats" },
+  { id: "promote", icon: <MessagesSquare size={20} />, label: "Promoted Profile" },
 ];
 
 const Sidebar = ({ activeItem, setActiveItem, isMobileMenuOpen, setIsMobileMenuOpen }) => {
+
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // No need to store response
+    setUser(null);
+    setError("Logged out successfully");
+    window.location.reload(); // Refresh the page
+  };
+
   return (
     <>
       {/* Mobile Menu Button */}
@@ -62,6 +72,7 @@ const Sidebar = ({ activeItem, setActiveItem, isMobileMenuOpen, setIsMobileMenuO
             </button>
           ))}
         </nav>
+        <div className='text-white bg-red-500 border-2 mt-20 flex items-center justify-center rounded-md mr-10 ml-6 my-10 p-2 cursor-pointer' onClick={handleLogout}>Log Out</div>
       </div>
     </>
   );

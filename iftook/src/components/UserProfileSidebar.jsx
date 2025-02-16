@@ -3,6 +3,7 @@ import { X, Wallet, Star } from 'lucide-react';
 import Modal from './Modal';
 import { getAllUsers, getWalletData, addMoneyToWallet, updateOnlineStatus } from '../utils/api'; // Import new function
 import { useNavigate } from 'react-router-dom';
+import ReviewModal from './ReviewModal';
 
 const UserProfileSidebar = ({ userId, onClose }) => {
   const [user, setUser] = useState(null);
@@ -117,7 +118,7 @@ const UserProfileSidebar = ({ userId, onClose }) => {
     setUser(null);
     setError("Logged out successfully");
     window.location.reload(); // Refresh the page
-};
+  };
 
 
   if (loading) {
@@ -217,9 +218,15 @@ const UserProfileSidebar = ({ userId, onClose }) => {
             </div>
           </div>
         </div>
+      <div className='text-white bg-red-500 border-2 mt-20 flex items-center justify-center rounded-md mr-10 ml-6 my-10 p-2 cursor-pointer' onClick={handleLogout}>Log Out</div>
       </div>
 
-      <div className='text-white bg-red-500 border-2 flex items-center justify-center rounded-md mx-10 my-10 p-3 cursor-pointer' onClick={handleLogout}>Log Out</div>
+
+      <ReviewModal
+        isOpen={isReviewModalOpen}
+        onClose={() => setIsReviewModalOpen(false)}
+        userId={userId} // Pass the userId to fetch reviews
+      />
 
       {/* Image Modal */}
       <Modal
@@ -348,52 +355,6 @@ const UserProfileSidebar = ({ userId, onClose }) => {
   </div>
 </Modal>
 
-      {/* Reviews Modal */}
-      <Modal
-        isOpen={isReviewModalOpen}
-        onClose={() => setIsReviewModalOpen(false)}
-        title="Reviews & Ratings"
-      >
-        <div className="space-y-4">
-          <div className="flex flex-wrap gap-2">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <button
-                key={star}
-                onClick={() => setSelectedFilter(selectedFilter === star ? null : star)}
-                className={`px-3 py-1 rounded-lg transition-colors ${
-                  selectedFilter === star
-                    ? "bg-yellow-100 text-yellow-700"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}
-              >
-                {star}★
-              </button>
-            ))}
-          </div>
-
-          <div className="space-y-3">
-            {reviews
-              .filter((review) => (selectedFilter ? review.stars === selectedFilter : true))
-              .map((review, index) => (
-                <div key={index} className="bg-gray-50 p-3 rounded-lg">
-                  <div className="flex justify-between">
-                    <div>
-                      <p className="text-yellow-500">{'★'.repeat(review.stars)}</p>
-                      <p className="text-sm text-gray-800 mt-1">{review.review}</p>
-                      <p className="text-xs text-gray-500 mt-1">{review.date}</p>
-                    </div>
-                    <button
-                      onClick={() => handleDeleteReview(index)}
-                      className="text-gray-400 hover:text-red-500 transition-colors"
-                    >
-                      <X size={16} />
-                    </button>
-                  </div>
-                </div>
-              ))}
-          </div>
-        </div>
-      </Modal>
     </div>
   );
 };
