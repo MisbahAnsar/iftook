@@ -58,9 +58,6 @@ const ChatContent = () => {
 
   return (
     <Container style={{ marginTop: '20px' }}>
-      <Typography variant="h4" gutterBottom style={{ fontWeight: 'bold', color: '#3f51b5' }}>
-        Chat Dashboard
-      </Typography>
       <Grid container spacing={3}>
         {/* Total Chat Rooms */}
         <Grid item xs={12} sm={6} md={4}>

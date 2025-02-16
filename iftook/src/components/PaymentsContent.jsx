@@ -14,6 +14,8 @@ import {
   TableRow,
   useMediaQuery,
   Box,
+  Tabs,
+  Tab
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
@@ -21,6 +23,7 @@ const PaymentsContent = () => {
   const [paymentsData, setPaymentsData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [tabValue, setTabValue] = useState(0);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -40,27 +43,9 @@ const PaymentsContent = () => {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="bg-gradient-to-br from-[#eef2ff] to-[#f8f9fc] p-6 rounded-2xl shadow-md space-y-6">
-          {/* Skeleton for Header */}
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-300 rounded w-1/2 mb-4"></div>
-            <div className="h-4 bg-gray-300 rounded w-1/3"></div>
-          </div>
-  
-          {/* Skeleton for Block Reason Input */}
-          <div className="animate-pulse">
-            <div className="h-4 bg-gray-300 rounded w-1/4 mb-2"></div>
-            <div className="h-20 bg-gray-300 rounded"></div>
-          </div>
-  
-          {/* Skeleton for Buttons */}
-          <div className="flex gap-2 animate-pulse">
-            <div className="h-10 bg-gray-300 rounded w-24"></div>
-            <div className="h-10 bg-gray-300 rounded w-24"></div>
-          </div>
-        </div>
-      </div>
+      <Container sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+        <CircularProgress />
+      </Container>
     );
   }
 
@@ -72,30 +57,38 @@ const PaymentsContent = () => {
     );
   }
 
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
+
   const renderTable = (title, color, data) => (
     <>
-      <Typography variant="h5" gutterBottom sx={{ mt: 3, color }}> {title} </Typography>
+      <Typography variant="h5" gutterBottom sx={{ mt: 3, color, fontWeight: 'bold' }}>{title}</Typography>
       {data.length > 0 ? (
-        <TableContainer component={Paper} sx={{ mb: 2, overflowX: isMobile ? 'auto' : 'visible' }}>
+        <TableContainer component={Paper} sx={{ mb: 2, overflowX: 'auto', borderRadius: 2, boxShadow: 3 }}>
           <Table size={isMobile ? 'small' : 'medium'}>
             <TableHead>
-              <TableRow sx={{ bgcolor: theme.palette.grey[200] }}>
-                <TableCell><strong>Sender</strong></TableCell>
-                {title === 'Wallet Transactions' && <TableCell><strong>Receiver</strong></TableCell>}
-                <TableCell><strong>Amount</strong></TableCell>
-                <TableCell><strong>Status</strong></TableCell>
-                <TableCell><strong>Title</strong></TableCell>
-                <TableCell><strong>Date</strong></TableCell>
-                <TableCell><strong>Notes</strong></TableCell>
+              <TableRow sx={{ bgcolor: theme.palette.primary.light }}>
+                <TableCell sx={{ fontWeight: 'bold' }}>Sender</TableCell>
+                {title === 'Wallet Transactions' && <TableCell sx={{ fontWeight: 'bold' }}>Receiver</TableCell>}
+                <TableCell sx={{ fontWeight: 'bold' }}>Amount</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Title</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Date</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Notes</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {data.map((item) => (
-                <TableRow key={item._id} sx={{ '&:nth-of-type(even)': { bgcolor: theme.palette.grey[100] } }}>
+                <TableRow key={item._id} sx={{ '&:nth-of-type(even)': { bgcolor: theme.palette.grey[100] }, '&:hover': { bgcolor: theme.palette.grey[200] } }}>
                   <TableCell>{item.sender?.name || 'N/A'}</TableCell>
                   {title === 'Wallet Transactions' && <TableCell>{item.receiver?.name || 'N/A'}</TableCell>}
-                  <TableCell>${item.amount}</TableCell>
-                  <TableCell>{item.paymentStatus}</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', color: 'green' }}>${item.amount}</TableCell>
+                  <TableCell>
+                    <Box sx={{ display: 'inline-block', px: 2, py: 1, borderRadius: 2, bgcolor: item.paymentStatus === 'Completed' ? 'green' : 'orange', color: 'white' }}>
+                      {item.paymentStatus}
+                    </Box>
+                  </TableCell>
                   <TableCell>{item.title}</TableCell>
                   <TableCell>{new Date(item.paymentDate).toLocaleDateString()}</TableCell>
                   <TableCell>{item.notes}</TableCell>
@@ -105,16 +98,22 @@ const PaymentsContent = () => {
           </Table>
         </TableContainer>
       ) : (
-        <Typography variant="body1" sx={{ mt: 1 }}> No {title.toLowerCase()}. </Typography>
+        <Typography variant="body1" sx={{ mt: 1, fontStyle: 'italic', color: 'gray' }}> No {title.toLowerCase()}. </Typography>
       )}
     </>
   );
 
   return (
     <Container sx={{ mt: 3, p: isMobile ? 1 : 3 }}>
-      {renderTable('Payments Received', '#4caf50', paymentsData.paymentsReceived)}
-      {renderTable('Payments Withdrawn', '#f44336', paymentsData.paymentsWithdrawn)}
-      {renderTable('Wallet Transactions', '#ff9800', paymentsData.walletTransactions)}
+      <Tabs value={tabValue} onChange={handleTabChange} variant="scrollable" scrollButtons="auto">
+        <Tab label="Payments Received" />
+        <Tab label="Payments Withdrawn" />
+        <Tab label="Wallet Transactions" />
+      </Tabs>
+
+      {tabValue === 0 && renderTable('Payments Received', '#000000', paymentsData.paymentsReceived)}
+      {tabValue === 1 && renderTable('Payments Withdrawn', '#000000', paymentsData.paymentsWithdrawn)}
+      {tabValue === 2 && renderTable('Wallet Transactions', '#000000', paymentsData.walletTransactions)}
     </Container>
   );
 };
