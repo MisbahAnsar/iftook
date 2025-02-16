@@ -392,7 +392,7 @@ export const getDashboardData = async () => {
         throw new Error(data.message || 'Failed to fetch dashboard data');
       }
   
-      return data.data; // Return only the `data` part of the response
+      return data; // Return only the `data` part of the response
     } catch (error) {
       console.error('Error fetching dashboard data:', error.message);
       throw new Error(error.message || 'Network error. Please try again.');

@@ -1,12 +1,12 @@
 import React from "react";
-import { LayoutDashboard, Users, Menu, MessagesSquare, IndianRupee } from "lucide-react";
+import { LayoutDashboard, Users, Menu, MessagesSquare, IndianRupee, User } from "lucide-react";
 
 const menuItems = [
   { id: "dashboard", icon: <LayoutDashboard size={20} />, label: "Dashboard" },
   { id: "users", icon: <Users size={20} />, label: "Users" },
   { id: "payments", icon: <IndianRupee size={20} />, label: "Payments" },
   { id: "chats", icon: <MessagesSquare size={20} />, label: "Chats" },
-  { id: "promote", icon: <MessagesSquare size={20} />, label: "Promoted Profile" },
+  { id: "promote", icon: <User size={20} />, label: "Promoted Profile" },
 ];
 
 const Sidebar = ({ activeItem, setActiveItem, isMobileMenuOpen, setIsMobileMenuOpen }) => {

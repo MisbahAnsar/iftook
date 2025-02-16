@@ -1,135 +1,78 @@
 import React, { useEffect, useState } from 'react';
-import { fetchChatRoomData } from '../utils/api'; // Import the API service
-import { Container, Typography, Grid, Paper, CircularProgress, Alert } from '@mui/material';
+import { fetchChatRoomData } from '../utils/api';
+import { Container, Typography, Grid, Paper, CircularProgress, Alert, Box } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 const ChatContent = () => {
   const [chatData, setChatData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const theme = useTheme();
 
   useEffect(() => {
     const getChatRoomData = async () => {
       try {
         const data = await fetchChatRoomData();
-        setChatData(data.data); // Set the data to state
+        setChatData(data.data);
       } catch (err) {
-        setError(err.message); // Handle errors
+        setError(err.message);
       } finally {
-        setLoading(false); // Stop loading
+        setLoading(false);
       }
     };
-
     getChatRoomData();
   }, []);
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="bg-gradient-to-br from-[#eef2ff] to-[#f8f9fc] p-6 rounded-2xl shadow-md space-y-6">
-          {/* Skeleton for Header */}
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-300 rounded w-1/2 mb-4"></div>
-            <div className="h-4 bg-gray-300 rounded w-1/3"></div>
-          </div>
-  
-          {/* Skeleton for Block Reason Input */}
-          <div className="animate-pulse">
-            <div className="h-4 bg-gray-300 rounded w-1/4 mb-2"></div>
-            <div className="h-20 bg-gray-300 rounded"></div>
-          </div>
-  
-          {/* Skeleton for Buttons */}
-          <div className="flex gap-2 animate-pulse">
-            <div className="h-10 bg-gray-300 rounded w-24"></div>
-            <div className="h-10 bg-gray-300 rounded w-24"></div>
-          </div>
-        </div>
-      </div>
+      <Container sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+        <CircularProgress />
+      </Container>
     );
   }
 
   if (error) {
     return (
-      <Container style={{ marginTop: '20px' }}>
+      <Container sx={{ mt: 2 }}>
         <Alert severity="error">{error}</Alert>
       </Container>
     );
   }
 
+  const stats = [
+    { label: 'Total Chat Rooms', value: chatData.totalChatRooms, color: theme.palette.primary.main },
+    { label: 'Paid Chat Rooms', value: chatData.totalPaidChatRooms, color: '#4caf50' },
+    { label: 'Unpaid Chat Rooms', value: chatData.totalUnpaidChatRooms, color: '#f44336' },
+    { label: 'Total Calls', value: chatData.totalCalls, color: '#ff9800' },
+    { label: 'Voice Calls', value: chatData.totalVoiceCalls, color: '#9c27b0' },
+    { label: 'Video Calls', value: chatData.totalVide0Calls, color: '#e91e63' },
+  ];
+
   return (
-    <Container style={{ marginTop: '20px' }}>
-      <Grid container spacing={3}>
-        {/* Total Chat Rooms */}
-        <Grid item xs={12} sm={6} md={4}>
-          <Paper elevation={3} style={{ padding: '20px', textAlign: 'center', backgroundColor: '#f5f5f5' }}>
-            <Typography variant="h6" gutterBottom>
-              Total Chat Rooms
-            </Typography>
-            <Typography variant="h4" style={{ color: '#3f51b5' }}>
-              {chatData.totalChatRooms}
-            </Typography>
-          </Paper>
-        </Grid>
-
-        {/* Total Paid Chat Rooms */}
-        <Grid item xs={12} sm={6} md={4}>
-          <Paper elevation={3} style={{ padding: '20px', textAlign: 'center', backgroundColor: '#f5f5f5' }}>
-            <Typography variant="h6" gutterBottom>
-              Paid Chat Rooms
-            </Typography>
-            <Typography variant="h4" style={{ color: '#4caf50' }}>
-              {chatData.totalPaidChatRooms}
-            </Typography>
-          </Paper>
-        </Grid>
-
-        {/* Total Unpaid Chat Rooms */}
-        <Grid item xs={12} sm={6} md={4}>
-          <Paper elevation={3} style={{ padding: '20px', textAlign: 'center', backgroundColor: '#f5f5f5' }}>
-            <Typography variant="h6" gutterBottom>
-              Unpaid Chat Rooms
-            </Typography>
-            <Typography variant="h4" style={{ color: '#f44336' }}>
-              {chatData.totalUnpaidChatRooms}
-            </Typography>
-          </Paper>
-        </Grid>
-
-        {/* Total Calls */}
-        <Grid item xs={12} sm={6} md={4}>
-          <Paper elevation={3} style={{ padding: '20px', textAlign: 'center', backgroundColor: '#f5f5f5' }}>
-            <Typography variant="h6" gutterBottom>
-              Total Calls
-            </Typography>
-            <Typography variant="h4" style={{ color: '#ff9800' }}>
-              {chatData.totalCalls}
-            </Typography>
-          </Paper>
-        </Grid>
-
-        {/* Total Voice Calls */}
-        <Grid item xs={12} sm={6} md={4}>
-          <Paper elevation={3} style={{ padding: '20px', textAlign: 'center', backgroundColor: '#f5f5f5' }}>
-            <Typography variant="h6" gutterBottom>
-              Voice Calls
-            </Typography>
-            <Typography variant="h4" style={{ color: '#9c27b0' }}>
-              {chatData.totalVoiceCalls}
-            </Typography>
-          </Paper>
-        </Grid>
-
-        {/* Total Video Calls */}
-        <Grid item xs={12} sm={6} md={4}>
-          <Paper elevation={3} style={{ padding: '20px', textAlign: 'center', backgroundColor: '#f5f5f5' }}>
-            <Typography variant="h6" gutterBottom>
-              Video Calls
-            </Typography>
-            <Typography variant="h4" style={{ color: '#e91e63' }}>
-              {chatData.totalVide0Calls}
-            </Typography>
-          </Paper>
-        </Grid>
+    <Container sx={{ mt: 4, p: 3 }}>
+      <Grid container spacing={3} justifyContent="center">
+        {stats.map((stat, index) => (
+          <Grid item xs={12} sm={6} md={4} key={index}>
+            <Paper
+              elevation={4}
+              sx={{
+                p: 3,
+                textAlign: 'center',
+                borderRadius: 3,
+                bgcolor: theme.palette.background.paper,
+                transition: '0.3s',
+                '&:hover': { boxShadow: 6, transform: 'translateY(-5px)' },
+              }}
+            >
+              <Typography variant="h6" color={theme.palette.text.secondary}>
+                {stat.label}
+              </Typography>
+              <Typography variant="h3" fontWeight="bold" sx={{ color: stat.color }}>
+                {stat.value}
+              </Typography>
+            </Paper>
+          </Grid>
+        ))}
       </Grid>
     </Container>
   );
