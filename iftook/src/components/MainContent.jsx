@@ -9,6 +9,9 @@ import ChatContent from "./ChatContent";
 import PaymentsContent from "./PaymentsContent";
 import PromotedProfileContent from "./PromotedProfileContent";
 import ReviewContent from "./ReviewContent";
+import SettingsContent from "./SettingsContent";
+import SupportContent from "./SupportContent";
+import TaxesContent from "./TaxesContent";
 
 const DefaultContent = ({ title }) => (
   <div className="bg-white rounded-lg shadow-md p-6">
@@ -43,6 +46,12 @@ const MainContent = ({ activeItem, selectedUserId, setSelectedUserId }) => {
         return <PromotedProfileContent />;
       case "review":
         return <ReviewContent />;
+      case "settings":
+        return <SettingsContent />;
+      case "support":
+        return <SupportContent />;
+      case "taxes": 
+        return <TaxesContent />;
       default:
         return <DefaultContent title={activeItem.charAt(0).toUpperCase() + activeItem.slice(1)} />;
     }
