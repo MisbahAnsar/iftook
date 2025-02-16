@@ -83,7 +83,7 @@ const PaymentsContent = () => {
                 <TableRow key={item._id} sx={{ '&:nth-of-type(even)': { bgcolor: theme.palette.grey[100] }, '&:hover': { bgcolor: theme.palette.grey[200] } }}>
                   <TableCell>{item.sender?.name || 'N/A'}</TableCell>
                   {title === 'Wallet Transactions' && <TableCell>{item.receiver?.name || 'N/A'}</TableCell>}
-                  <TableCell sx={{ fontWeight: 'bold', color: 'green' }}>${item.amount}</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', color: 'green' }}>₹{item.amount}</TableCell>
                   <TableCell>
                     <Box sx={{ display: 'inline-block', px: 2, py: 1, borderRadius: 2, bgcolor: item.paymentStatus === 'Completed' ? 'green' : 'orange', color: 'white' }}>
                       {item.paymentStatus}
