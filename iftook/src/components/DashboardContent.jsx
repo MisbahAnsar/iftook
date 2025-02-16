@@ -3,7 +3,6 @@ import { getDashboardData } from "../utils/api";
 import { Users, UserCheck, UserMinus, UserX, CreditCard, Clock, CheckCircle, Loader2, MessageCircle, Phone, Video, Wallet, ThumbsUp, ThumbsDown, Activity } from 'lucide-react';
 
 const DashboardContent = () => {
-  // ... existing state and useEffect logic ...
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -12,6 +11,7 @@ const DashboardContent = () => {
     const fetchDashboardData = async () => {
       try {
         const data = await getDashboardData();
+        console.log(data.data);
         setDashboardData(data.data);
         setLoading(false);
       } catch (error) {
